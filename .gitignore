@@ -28,3 +28,10 @@ build/
 
 # Generated PDF exports (live downloads, not source)
 *.pdf
+
+# Supabase CLI cache (machine-specific, may contain tokens)
+supabase/.temp/
+supabase/.branches/
+
+# Local handover notes — contains live API keys, CLI tokens, admin password
+MASTER_CONTEXT.md
