@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Pedagogy Evaluation Platform — Evaluate your Techno-Pedagogical Practice</title>
+<meta name="description" content="A research-informed self-assessment for educators, based on the Firmin (2020) techno-pedagogical practice framework." />
+
+<link rel="stylesheet" href="css/main.css" />
+<link rel="stylesheet" href="css/landing.css" />
+<link rel="stylesheet" href="css/modal.css" />
+</head>
+<body>
+
+<!-- ===================== NAV ===================== -->
+<header class="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="index.html">
+      <span class="mark">P</span>
+      <span>Pedagogy<span class="muted"> / Evaluation</span></span>
+    </a>
+    <nav class="nav-links">
+      <a href="#framework">Firmin (2020)</a>
+      <a href="#how">How it works</a>
+      <a href="#team">Our Team</a>
+      <a href="admin.html" class="nav-admin" title="Admin dashboard">Admin</a>
+      <button class="btn-signin" data-open-modal="register">Begin <span aria-hidden="true">→</span></button>
+    </nav>
+  </div>
+</header>
+
+<!-- ===================== HERO ===================== -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-grid">
+
+      <!-- Left: copy + CTA -->
+      <div>
+        <h1 data-animate>
+          Evaluate your<br>
+          <span class="accent">Techno&#8209;Pedagogical</span><br>
+          Practice.
+        </h1>
+
+        <p class="hero-body" data-animate>
+          A research-informed self-assessment for educators. Twenty calibrated questions
+          across four dimensions — reflect, score, and receive a personalised written
+          report grounded in Dr Selena Firmin's doctoral framework.
+        </p>
+
+        <div class="hero-cta" data-animate>
+          <button class="btn btn-primary btn-lg" data-open-modal="register">
+            Begin Assessment
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+          <button class="btn btn-ghost btn-lg" data-anon-start>
+            Try Anonymously
+          </button>
+        </div>
+
+        <div class="hero-stats-row" data-animate>
+          <div class="hsr-item">
+            <span class="hsr-num">4</span>
+            <span class="hsr-lbl">Categories</span>
+          </div>
+          <div class="hsr-item">
+            <span class="hsr-num">20</span>
+            <span class="hsr-lbl">Questions</span>
+          </div>
+          <div class="hsr-item">
+            <span class="hsr-num">~5</span>
+            <span class="hsr-lbl">Minutes</span>
+          </div>
+          <div class="hsr-item">
+            <span class="hsr-num">∞</span>
+            <span class="hsr-lbl">Retakes</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: score preview card -->
+      <div data-animate>
+        <div class="score-card">
+          <div class="sc-header">
+            <span class="sc-title">Assessment Profile</span>
+            <span class="sc-badge">Sample</span>
+          </div>
+
+          <div class="sc-categories">
+            <div class="sc-cat tp">
+              <div class="sc-cat-head">
+                <span class="sc-code">TP</span>
+                <span class="sc-cat-name">Teaching Practice</span>
+                <span class="sc-pct">84%</span>
+              </div>
+              <div class="sc-bar-track">
+                <div class="sc-bar-fill" style="--w:84%; --d:0.2s"></div>
+              </div>
+            </div>
+            <div class="sc-cat pd">
+              <div class="sc-cat-head">
+                <span class="sc-code">PD</span>
+                <span class="sc-cat-name">Pedagogical Development</span>
+                <span class="sc-pct">68%</span>
+              </div>
+              <div class="sc-bar-track">
+                <div class="sc-bar-fill" style="--w:68%; --d:0.4s"></div>
+              </div>
+            </div>
+            <div class="sc-cat ta">
+              <div class="sc-cat-head">
+                <span class="sc-code">TA</span>
+                <span class="sc-cat-name">Technology Adoption</span>
+                <span class="sc-pct">91%</span>
+              </div>
+              <div class="sc-bar-track">
+                <div class="sc-bar-fill" style="--w:91%; --d:0.6s"></div>
+              </div>
+            </div>
+            <div class="sc-cat tpp">
+              <div class="sc-cat-head">
+                <span class="sc-code">TPP</span>
+                <span class="sc-cat-name">Techno-Pedagogical Practice</span>
+                <span class="sc-pct">76%</span>
+              </div>
+              <div class="sc-bar-track">
+                <div class="sc-bar-fill" style="--w:76%; --d:0.8s"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sc-overall">
+            <span class="sc-overall-label">Overall Score</span>
+            <span class="sc-overall-score">79.8<span>/ 100</span></span>
+          </div>
+
+          <p class="sc-footer">Firmin (2020) · Monash University · Sample data only</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MARQUEE ===================== -->
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track">
+    <span>Teaching Practice</span><span class="dot">·</span>
+    <span class="alt">Pedagogical Development</span><span class="dot">·</span>
+    <span>Technology Adoption</span><span class="dot">·</span>
+    <span class="alt">Techno-Pedagogical Practice</span><span class="dot">·</span>
+    <span>Teaching Practice</span><span class="dot">·</span>
+    <span class="alt">Pedagogical Development</span><span class="dot">·</span>
+    <span>Technology Adoption</span><span class="dot">·</span>
+    <span class="alt">Techno-Pedagogical Practice</span><span class="dot">·</span>
+  </div>
+</div>
+
+<!-- ===================== HOW IT WORKS ===================== -->
+<section id="how" class="section container">
+  <div class="section-head-row reveal">
+    <div>
+      <div class="section-eyebrow">How it works</div>
+      <h2>Three steps.<br><span class="italic-accent">One clear picture.</span></h2>
+    </div>
+    <p>Each response is weighted, scored, and contextualised against the Firmin (2020) techno-pedagogical practice framework.</p>
+  </div>
+
+  <div class="howto-grid">
+    <div class="howto-card reveal">
+      <div class="howto-card-top">
+        <span class="howto-num">01</span>
+        <span class="howto-tag">~5 minutes</span>
+      </div>
+      <h3>Complete</h3>
+      <p>Answer 20 calibrated statements across four research-defined categories on a five-point Likert scale. No time pressure — auto-saves as you go.</p>
+    </div>
+    <div class="howto-card reveal">
+      <div class="howto-card-top">
+        <span class="howto-num">02</span>
+        <span class="howto-tag">Live results</span>
+      </div>
+      <h3>Score</h3>
+      <p>The platform calculates weighted percentages per category and visualises your techno-pedagogical profile instantly.</p>
+    </div>
+    <div class="howto-card reveal">
+      <div class="howto-card-top">
+        <span class="howto-num">03</span>
+        <span class="howto-tag">PDF · APA cited</span>
+      </div>
+      <h3>Report</h3>
+      <p>Receive a full written report with interpretations, targeted recommendations, and an exportable PDF grounded in Firmin (2020).</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FRAMEWORK ===================== -->
+<section id="framework" class="section container">
+  <div class="section-eyebrow reveal" style="margin-bottom:2rem;">The Framework</div>
+
+  <div class="framework-grid">
+    <div class="reveal">
+      <blockquote class="framework-quote">
+        "Effective teaching with technology is not the substitution of practice, but the
+        intentional alignment of pedagogy and tools toward defined learning outcomes."
+        <cite class="framework-cite">— Firmin (2020), Monash University</cite>
+      </blockquote>
+      <p class="framework-body">
+        Dr Selena Firmin's doctoral research examined how IT academics perceive and apply teaching
+        philosophy, identifying four interrelated dimensions of techno-pedagogical practice.
+        This platform operationalises that framework into a practical, repeatable self-assessment.
+      </p>
+    </div>
+
+    <div class="cat-list reveal">
+      <div class="cat-row tp">
+        <span class="code">TP</span>
+        <span class="meta">
+          <span class="name">Teaching Practice</span>
+          <span class="desc">Student-centred design, reflective adaptation.</span>
+        </span>
+        <span class="arrow">→</span>
+      </div>
+      <div class="cat-row pd">
+        <span class="code">PD</span>
+        <span class="meta">
+          <span class="name">Pedagogical Development</span>
+          <span class="desc">Research engagement, collegial growth.</span>
+        </span>
+        <span class="arrow">→</span>
+      </div>
+      <div class="cat-row ta">
+        <span class="code">TA</span>
+        <span class="meta">
+          <span class="name">Technology Adoption</span>
+          <span class="desc">Confident, evaluated use of digital tools.</span>
+        </span>
+        <span class="arrow">→</span>
+      </div>
+      <div class="cat-row tpp">
+        <span class="code">TPP</span>
+        <span class="meta">
+          <span class="name">Techno-Pedagogical Practice</span>
+          <span class="desc">Intentional integration of pedagogy + tech.</span>
+        </span>
+        <span class="arrow">→</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TEAM ===================== -->
+<section id="team" class="section container">
+
+  <div class="section-eyebrow reveal" style="margin-bottom:2.25rem;">ITECH3208 · Capstone Team · Federation University Australia</div>
+
+  <div class="team-grid reveal">
+
+    <div class="team-card team-card--lead">
+      <div class="tc-role">Developer</div>
+      <div class="tc-name">Mushfiqur Rahman</div>
+    </div>
+
+    <div class="team-card">
+      <div class="tc-role">Scrum Master</div>
+      <div class="tc-name">Shafiullah Anik</div>
+    </div>
+
+    <div class="team-card">
+      <div class="tc-role">Product Owner</div>
+      <div class="tc-name">Kenny George Joseph</div>
+    </div>
+
+    <div class="team-card">
+      <div class="tc-role">Tester</div>
+      <div class="tc-name">Albin Roy</div>
+    </div>
+
+    <div class="team-card team-card--client">
+      <div class="tc-client-left">
+        <div class="tc-role">Client · Research Supervisor</div>
+        <div class="tc-name">Dr Selena (Sally) Firmin</div>
+      </div>
+      <div class="tc-client-right">
+        <span class="tc-sub">Monash University · Firmin (2020)</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CTA strip -->
+  <div class="cta-strip reveal" style="margin-top:3rem;">
+    <div>
+      <div class="section-eyebrow" style="margin-bottom:.85rem;">Ready to begin?</div>
+      <h2>
+        Built at <span class="italic-accent">Federation&nbsp;University&nbsp;Australia</span>
+        for educators everywhere.
+      </h2>
+    </div>
+    <div style="position:relative;z-index:2;">
+      <button class="btn btn-primary btn-lg" data-open-modal="register" style="width:100%;">
+        Start your assessment
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+      <button class="btn btn-ghost btn-lg" data-anon-start style="width:100%; margin-top:.6rem;">
+        Continue anonymously
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="footer">
+  <div class="container footer-inner">
+    <div>
+      <div class="brand" style="margin-bottom:.9rem;">
+        <span class="mark">P</span>
+        <span>Pedagogy Evaluation Platform</span>
+      </div>
+      <p>A capstone project (ITECH3208) at Federation University Australia, operationalising the Firmin (2020) techno-pedagogical practice framework as a self-assessment tool for educators.</p>
+    </div>
+    <div>
+      <h4>Project</h4>
+      <ul>
+        <li><a href="#how">How it works</a></li>
+        <li><a href="#framework">Framework</a></li>
+        <li><a href="questionnaire.html">Assessment</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Reference</h4>
+      <ul>
+        <li>Firmin, S. (2020)</li>
+        <li>Monash University</li>
+        <li>ProQuest D&amp;T Global</li>
+      </ul>
+    </div>
+  </div>
+  <div class="container legal">
+    <span>© 2026 Federation University Australia · Pedagogy Evaluation Platform</span>
+    <span>v1.0 · ITECH3208</span>
+  </div>
+</footer>
+
+<!-- ===================== AUTH MODAL ===================== -->
+<div class="modal-backdrop" id="auth-modal" data-close-modal>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <button class="modal-close" data-close-modal aria-label="Close">×</button>
+
+    <div class="modal-eyebrow">Access</div>
+    <h2 id="modal-title" class="modal-title">Start the assessment</h2>
+    <p class="modal-sub">Sign in, create an account, or continue anonymously.</p>
+
+    <div class="tabs" role="tablist">
+      <button class="tab active" data-tab="signin">Sign in</button>
+      <button class="tab" data-tab="register">Create account</button>
+      <button class="tab" data-tab="anonymous">Anonymous</button>
+    </div>
+
+    <!-- Sign in -->
+    <form class="panel active" data-panel="signin" id="signin-form" novalidate>
+      <div class="field">
+        <label for="l-email">Email</label>
+        <input id="l-email" type="email" placeholder="you@university.edu" autocomplete="email" />
+        <span class="err"></span>
+      </div>
+      <div class="field">
+        <label for="l-pass">Password</label>
+        <input id="l-pass" type="password" placeholder="Minimum 8 characters" autocomplete="current-password" />
+        <span class="err"></span>
+      </div>
+      <button class="btn btn-primary" id="l-submit" type="submit" disabled>Sign in & continue</button>
+      <div class="alt-line">New here? <button type="button" data-open-modal="register">Create an account</button></div>
+    </form>
+
+    <!-- Register -->
+    <form class="panel" data-panel="register" id="register-form" novalidate>
+      <div class="field">
+        <label for="r-name">Full name</label>
+        <input id="r-name" type="text" placeholder="First Last" autocomplete="name" />
+        <span class="err"></span>
+      </div>
+      <div class="field">
+        <label for="r-email">Email</label>
+        <input id="r-email" type="email" placeholder="you@university.edu" autocomplete="email" />
+        <span class="err"></span>
+      </div>
+      <div class="field">
+        <label for="r-pass">Password</label>
+        <input id="r-pass" type="password" placeholder="At least 8 characters" autocomplete="new-password" />
+        <span class="err"></span>
+        <div class="strength" id="r-strength" aria-hidden="true">
+          <span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span>
+        </div>
+        <span class="strength-label" id="r-strength-label"></span>
+      </div>
+      <label class="consent">
+        <input id="r-consent" type="checkbox" />
+        <span>I consent to my responses being stored for the purpose of generating my personalised assessment report. No data is shared with third parties.</span>
+      </label>
+      <button class="btn btn-primary" id="r-submit" type="submit" disabled>Create account & begin</button>
+      <div class="alt-line">Already registered? <button type="button" data-open-modal="signin">Sign in instead</button></div>
+    </form>
+
+    <!-- OTP Verification (shown programmatically after register) -->
+    <div class="panel otp-panel" data-panel="verify" id="verify-panel">
+      <div class="otp-intro">
+        <div class="otp-icon">✉</div>
+        <p>We sent a <strong>6-digit code</strong> to</p>
+        <p class="otp-email" id="otp-email-display">your email address</p>
+        <p class="otp-hint">Check your inbox and spam folder. Code expires in 1 hour.</p>
+      </div>
+      <div class="field">
+        <label for="otp-code">Verification code</label>
+        <input id="otp-code" type="text" inputmode="numeric" placeholder="000000" maxlength="6" autocomplete="one-time-code" />
+        <span class="err" id="otp-code-err"></span>
+      </div>
+      <button class="btn btn-primary" id="otp-submit" type="button" disabled>Verify &amp; begin →</button>
+      <div class="alt-line">Didn't receive it? <button type="button" id="otp-resend">Resend code</button></div>
+    </div>
+
+    <!-- Anonymous -->
+    <form class="panel anon-panel" data-panel="anonymous" id="anon-form" novalidate>
+      <div class="anon-card">
+        <h4>One click, no account</h4>
+        <p>Complete the entire assessment, view results, and export a PDF without registering. Responses are kept on this device only.</p>
+      </div>
+      <label class="consent">
+        <input id="a-consent" type="checkbox" />
+        <span>I understand my responses are stored locally on this device for the duration of my assessment.</span>
+      </label>
+      <button class="btn btn-primary" id="a-submit" type="submit" disabled>
+        Continue anonymously →
+      </button>
+      <div class="alt-line">Prefer to save results? <button type="button" data-open-modal="register">Create an account</button></div>
+    </form>
+  </div>
+</div>
+
+<!-- ===================== SCRIPTS ===================== -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<script src="js/supabase.js"></script>
+<script src="js/questions.js"></script>
+<script src="js/scoring.js"></script>
+<script src="js/cursor.js"></script>
+<script src="js/auth.js"></script>
+
+<script>
+  if (window.gsap) {
+    gsap.from('[data-animate]', {
+      opacity: 0, y: 24, duration: 0.7,
+      stagger: 0.09, ease: 'power3.out'
+    });
+    if (window.ScrollTrigger) {
+      gsap.registerPlugin(ScrollTrigger);
+      gsap.utils.toArray('.reveal').forEach(el => {
+        gsap.from(el, {
+          scrollTrigger: { trigger: el, start: 'top 88%' },
+          opacity: 0, y: 28, duration: 0.65, ease: 'power3.out'
+        });
+      });
+    }
+  }
+</script>
+</body>
+</html>
