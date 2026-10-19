@@ -1,0 +1,912 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>PEP — Sprint 4 Technical Report</title>
+<!--
+  Source for PEP_Sprint4_Report.pdf. Figures live in PEP_Sprint4_Report_assets/.
+  To regenerate after editing, from this folder:
+
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
+      --headless --disable-gpu --no-pdf-header-footer \
+      --print-to-pdf="PEP_Sprint4_Report.pdf" --virtual-time-budget=4000 \
+      "file://$PWD/PEP_Sprint4_Report.html"
+
+  Then: python3 stamp_page_numbers.py PEP_Sprint4_Report.pdf
+-->
+<style>
+  @page { size: A4; margin: 18mm 16mm 16mm; }
+
+  :root {
+    --ink:      #17202C;
+    --body:     #2F3742;
+    --muted:    #667080;
+    --line:     #D3D8DF;
+    --line-2:   #E8EBEF;
+    --accent:   #1F5A96;
+    --accent-d: #174878;
+    --wash:     #F4F6F9;
+    --green:    #1E7A4E;
+    --amber:    #935F00;
+    --red:      #B42318;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body {
+    margin: 0;
+    font-family: "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+    font-size: 10.2pt;
+    line-height: 1.52;
+    color: var(--body);
+  }
+  h1, h2, h3, h4, .sans, figcaption, table.data th, .pill, .eyebrow {
+    font-family: -apple-system, "Helvetica Neue", Arial, sans-serif;
+  }
+  h1, h2, h3, h4 { color: var(--ink); margin: 0; font-weight: 700; }
+
+  /* ---------- Title page ---------- */
+  .cover { page-break-after: always; }
+  .rule-top { height: 3px; background: var(--accent); width: 58px; margin: 18mm 0 8mm; }
+  .eyebrow {
+    font-size: 7.6pt; letter-spacing: .2em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 4mm;
+  }
+  .cover h1 { font-size: 28pt; line-height: 1.05; letter-spacing: -.025em; margin-bottom: 3.5mm; }
+  .cover h1 em { font-style: normal; color: var(--accent); }
+  .cover .lede { font-size: 10.6pt; line-height: 1.5; max-width: 140mm; margin: 0 0 6mm; }
+
+  .cover-meta {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4mm 8mm;
+    border-top: 1px solid var(--line); padding-top: 4.5mm; margin: 0 0 5mm;
+  }
+  .cover-meta dt {
+    font-family: -apple-system, "Helvetica Neue", Arial, sans-serif;
+    font-size: 7.2pt; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 1.2mm;
+  }
+  .cover-meta dd { margin: 0; font-size: 10pt; color: var(--ink); font-weight: 600; }
+
+  .cover-split {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10mm;
+    border-top: 1px solid var(--line); padding-top: 5mm;
+  }
+  .cover-split table { width: 100%; border-collapse: collapse; }
+  .cover-split td { padding: 1mm 0; font-size: 8.8pt; border-bottom: 1px solid var(--line-2); }
+  .cover-split td:first-child { color: var(--ink); font-weight: 600; }
+  .cover-split td:last-child { color: var(--muted); text-align: right; }
+  .cover-split tr:last-child td { border-bottom: none; }
+  .toc td:last-child { color: var(--ink); font-weight: 600; text-align: left; }
+  .toc td.tocn {
+    font-family: -apple-system, "Helvetica Neue", Arial, sans-serif;
+    font-size: 8.2pt; color: var(--accent); font-weight: 700;
+    letter-spacing: .1em; width: 9mm; padding-right: 3mm;
+  }
+
+  /* ---------- Sections ---------- */
+  section { page-break-before: auto; }
+  h2 {
+    font-size: 14pt; letter-spacing: -.012em;
+    margin: 0 0 1.5mm; padding-bottom: 1.8mm;
+    border-bottom: 1.6px solid var(--ink);
+    page-break-after: avoid; page-break-inside: avoid;
+  }
+  section + section h2 { margin-top: 9mm; }
+  section.keep { page-break-inside: avoid; }
+  section.newpage { page-break-before: always; }
+  section.newpage h2 { margin-top: 0; }
+  h2 .n {
+    font-size: 8.2pt; color: var(--accent); letter-spacing: .16em;
+    display: block; margin-bottom: 1.2mm; font-weight: 700;
+  }
+  h3 { font-size: 10.4pt; margin: 5.5mm 0 1.8mm; page-break-after: avoid; }
+  p { margin: 0 0 2.6mm; }
+  .sub {
+    font-family: -apple-system, "Helvetica Neue", Arial, sans-serif;
+    color: var(--muted); font-size: 8.8pt; margin: -0.5mm 0 3.5mm;
+  }
+  ul, ol { margin: 0 0 3mm; padding-left: 5mm; }
+  li { margin-bottom: 1.4mm; }
+
+  code {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 8.3pt; background: var(--wash);
+    border: 1px solid var(--line-2); border-radius: 2px;
+    padding: 0.3mm 1.1mm; color: var(--accent-d);
+  }
+  pre {
+    font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 7.9pt; line-height: 1.45;
+    background: var(--wash); border: 1px solid var(--line-2); border-left: 2px solid var(--accent);
+    padding: 3mm 4mm; margin: 2mm 0 4mm; white-space: pre-wrap; page-break-inside: avoid; color: var(--ink);
+  }
+
+  table.data { width: 100%; border-collapse: collapse; margin: 2mm 0 4mm; page-break-inside: avoid; }
+  table.data th {
+    text-align: left; font-size: 7.2pt; letter-spacing: .13em; text-transform: uppercase;
+    color: var(--muted); font-weight: 600;
+    border-bottom: 1px solid var(--ink); padding: 0 3mm 1.8mm 0;
+  }
+  table.data td {
+    padding: 2mm 3mm 2mm 0; vertical-align: top;
+    border-bottom: 1px solid var(--line-2); font-size: 9.4pt;
+  }
+  table.data td:last-child, table.data th:last-child { padding-right: 0; }
+  table.data .k { font-weight: 600; color: var(--ink); }
+  table.data .nw { white-space: nowrap; }
+  table.data.compact td { padding-top: 1.4mm; padding-bottom: 1.4mm; font-size: 8.9pt; }
+  table.data.breakable { page-break-inside: auto; }
+  table.data.breakable tr { page-break-inside: avoid; }
+
+  .pill {
+    display: inline-block;
+    font-size: 7.2pt; font-weight: 700; letter-spacing: .09em; text-transform: uppercase;
+    padding: 0.6mm 1.8mm; border-radius: 2px; white-space: nowrap;
+  }
+  .pill.done  { color: var(--green); background: #E6F2EB; border: 1px solid #B4D6C2; }
+  .pill.sched { color: var(--amber); background: #FAF0DA; border: 1px solid #E0C08A; }
+  .pill.risk  { color: var(--red);   background: #FBEAE8; border: 1px solid #EBBDB8; }
+
+  .callout {
+    padding: 4mm 5mm; background: var(--wash);
+    border-left: 2px solid var(--accent); margin: 3mm 0 4mm;
+    page-break-inside: avoid; font-size: 9.7pt;
+  }
+  .callout p:last-child { margin-bottom: 0; }
+  .callout .lbl {
+    font-family: -apple-system, "Helvetica Neue", Arial, sans-serif;
+    font-size: 7.4pt; letter-spacing: .15em; text-transform: uppercase;
+    color: var(--accent-d); display: block; margin-bottom: 1.5mm; font-weight: 700;
+  }
+  .quote {
+    font-style: italic; color: var(--ink);
+    border-left: 2px solid var(--line); padding: 1mm 0 1mm 4mm; margin: 0 0 3.5mm;
+  }
+
+  .defect { page-break-inside: avoid; margin-bottom: 4.2mm; }
+  .defect h4 { font-size: 10pt; margin-bottom: 1mm; }
+  .defect .meta { font-family: "SF Mono", Menlo, monospace; font-size: 7.8pt; color: var(--muted); margin-bottom: 1.2mm; }
+
+  figure { margin: 3mm 0 5mm; page-break-inside: avoid; }
+  figure img { display: block; width: 100%; max-height: 112mm; object-fit: contain; object-position: top center; border: 1px solid var(--line); border-radius: 3px; }
+  figure.narrow img { width: 78%; margin: 0 auto; }
+  figure.half img { width: 46%; margin: 0 auto; }
+  figcaption { font-size: 8.2pt; color: var(--muted); margin-top: 1.8mm; line-height: 1.4; }
+  figcaption b { color: var(--ink); }
+  .fig-row { display: grid; gap: 3mm; page-break-inside: avoid; }
+  .fig-row.two { grid-template-columns: 1fr 1fr; }
+  .fig-row.three { grid-template-columns: 1fr 1fr 1fr; }
+  .fig-row img { border: 1px solid var(--line); border-radius: 3px; width: 100%; display: block; max-height: 95mm; object-fit: contain; object-position: top; }
+  .fig-row .cap { font-family: -apple-system, "Helvetica Neue", Arial, sans-serif; font-size: 7.6pt; color: var(--muted); margin-bottom: 1mm; }
+  .stack { display: grid; gap: 2mm; }
+  .live { font-family: -apple-system, "Helvetica Neue", Arial, sans-serif; font-size: 7pt; font-weight: 700; letter-spacing: .1em; color: var(--green); }
+  .rev { font-weight: 400; color: var(--muted); font-size: 8pt; }
+  .toc-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0 5mm; align-items: start; }
+  .refs p { margin: 0 0 2mm; padding-left: 8mm; text-indent: -8mm; font-size: 9.4pt; }
+  .retro ul { margin: 0 0 3mm; }
+</style>
+</head>
+<body>
+
+<!-- ============================ TITLE PAGE ============================ -->
+<div class="cover">
+  <div class="rule-top"></div>
+  <div class="eyebrow">Federation University Australia · ITECH3208 IT Capstone Project 1</div>
+  <h1>Sprint 4 <em>Technical Report.</em></h1>
+  <p class="lede">
+    Pedagogy Evaluation Platform — a web-based self-assessment tool implementing Firmin's (2020)
+    Techno-Pedagogical Practice framework. Sprint 4 delivered a user dashboard with three years
+    of history, handling of current and previous attempts, historical comparison with charts,
+    ten-minute evaluation sessions, and storage of evaluation data only on completion. The
+    interface was redesigned and the production platform was recovered from an outage.
+  </p>
+
+  <dl class="cover-meta">
+    <div><dt>Unit</dt><dd>ITECH3208 IT Capstone Project 1</dd></div>
+    <div><dt>Sprint</dt><dd>Sprint 4</dd></div>
+    <div><dt>Status</dt><dd>Implemented, deployed and verified</dd></div>
+    <div><dt>Date</dt><dd>14 September 2026<br><span class="rev">Revision 2 · 18 September 2026</span></dd></div>
+    <div><dt>Live system</dt><dd>lmctpro2026.github.io/pedagogy-evaluation-platform</dd></div>
+    <div><dt>Client</dt><dd>Dr Selena (Sally) Firmin</dd></div>
+  </dl>
+
+  <div class="cover-split">
+    <div>
+      <div class="eyebrow">Project team</div>
+      <table>
+        <tr><td>Mushfiqur Rahman</td><td>Lead Developer</td></tr>
+        <tr><td>Shafiullah Anik</td><td>Scrum Master</td></tr>
+        <tr><td>Albin Roy</td><td>Product Owner</td></tr>
+        <tr><td>Merajun Nabi</td><td>Tester</td></tr>
+      </table>
+    </div>
+    <div>
+      <div class="eyebrow">Contents</div>
+      <div class="toc-cols"><table class="toc"><tr><td class="tocn">01</td><td>Summary</td></tr><tr><td class="tocn">02</td><td>Sprint objectives</td></tr><tr><td class="tocn">03</td><td>Sprint process</td></tr><tr><td class="tocn">04</td><td>Production recovery</td></tr><tr><td class="tocn">05</td><td>User dashboard and history</td></tr><tr><td class="tocn">06</td><td>Current and previous attempts</td></tr><tr><td class="tocn">07</td><td>Historical comparison</td></tr><tr><td class="tocn">08</td><td>Ten-minute session</td></tr><tr><td class="tocn">09</td><td>Anonymous until completion</td></tr></table><table class="toc"><tr><td class="tocn">10</td><td>Architecture and data model</td></tr><tr><td class="tocn">11</td><td>Interface redesign</td></tr><tr><td class="tocn">12</td><td>Quality assurance</td></tr><tr><td class="tocn">13</td><td>Testing and acceptance</td></tr><tr><td class="tocn">14</td><td>Risks and limitations</td></tr><tr><td class="tocn">15</td><td>Deployment and outstanding items</td></tr><tr><td class="tocn">16</td><td>Retrospective</td></tr><tr><td class="tocn">17</td><td>References</td></tr><tr><td class="tocn">18</td><td>Appendix</td></tr></table></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================ 01 SUMMARY ============================ -->
+<section>
+  <h2><span class="n">01</span>Summary</h2>
+
+  <p>
+    Sprint 4 addressed six requirement areas raised by the client in sprint planning: a
+    dashboard for signed-in users, storage and display of up to three years of evaluation data,
+    correct handling of a current and a previous attempt (including the option to delete the
+    previous one), year-to-year comparison presented with charts, a ten-minute limit on each
+    evaluation session, and keeping an evaluation anonymous until it is completed.
+  </p>
+  <p>
+    All six are implemented, deployed to the live platform, and verified against the thirteen
+    acceptance criteria derived from the client's wording (Section 13). The rules are enforced
+    in the database rather than only in the browser, through a single write path for completed
+    evaluations. The work also included a complete interface redesign and the recovery of the
+    production database, which had become unreachable before the sprint began.
+  </p>
+
+  <table class="data">
+    <thead>
+      <tr><th style="width:28%">Requirement area</th><th>Outcome</th><th class="nw" style="width:14%">Status</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="k">R1 · User dashboard</td>
+          <td>A dashboard page showing the active result, overall progress, stored history and every attempt.</td>
+          <td><span class="pill done">Delivered</span></td></tr>
+      <tr><td class="k">R2 · Three-year history</td>
+          <td>Attempts retained and displayed for three years; older data purged automatically.</td>
+          <td><span class="pill done">Delivered</span></td></tr>
+      <tr><td class="k">R3 · Current and previous attempts</td>
+          <td>Up to two attempts per year; the newest is the active result; the previous attempt can be deleted at submission or from the dashboard.</td>
+          <td><span class="pill done">Delivered</span></td></tr>
+      <tr><td class="k">R4 · Historical comparison</td>
+          <td>Per-category Improved / Decreased / Stayed similar labels, a comparison bar chart and a year-to-year line chart.</td>
+          <td><span class="pill done">Delivered</span></td></tr>
+      <tr><td class="k">R5 · Ten-minute session</td>
+          <td>Visible countdown with warnings; on expiry answers are cleared and nothing is stored; late submissions are rejected by the database.</td>
+          <td><span class="pill done">Delivered</span></td></tr>
+      <tr><td class="k">R6 · Anonymous until completion</td>
+          <td>No sign-in or database write while an evaluation is in progress; one transactional write on submission.</td>
+          <td><span class="pill done">Delivered</span></td></tr>
+      <tr><td class="k">Interface redesign</td>
+          <td>All seven pages rebuilt on a shared, accessible design system.</td>
+          <td><span class="pill done">Delivered</span></td></tr>
+      <tr><td class="k">Email delivery</td>
+          <td>Results email function hardened and made provider-independent; sender account configuration outstanding (Section 15).</td>
+          <td><span class="pill sched">Outstanding</span></td></tr>
+    </tbody>
+  </table>
+
+  <table class="data compact">
+    <thead><tr><th>Measure</th><th>Value</th><th>Measure</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td>Acceptance criteria met</td><td class="k">13 of 13</td><td>Production releases</td><td class="k">6</td></tr>
+      <tr><td>Files changed</td><td class="k">32</td><td>Lines added / removed</td><td class="k">6,836 / 3,393</td></tr>
+      <tr><td>Automated database checks</td><td class="k">48, all passing</td><td>New database functions</td><td class="k">3</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============================ 02 OBJECTIVES ============================ -->
+<section class="keep">
+  <h2><span class="n">02</span>Sprint objectives</h2>
+  <p class="sub">As specified by the client for Sprint 4.</p>
+
+  <table class="data">
+    <thead><tr><th style="width:8%">Ref</th><th>Requirement as stated</th></tr></thead>
+    <tbody>
+      <tr><td class="k">R1</td><td>Create a UI/dashboard for the user.</td></tr>
+      <tr><td class="k">R2</td><td>Store and display evaluation data for up to 3 years.</td></tr>
+      <tr><td class="k">R3</td><td>Handle two attempts/results. When there are two values/attempts, the system should handle the previous and current result properly. The user should have the option to delete/override the previous attempt. If the previous attempt is deleted/overridden, only the current attempt should be used as the active result.</td></tr>
+      <tr><td class="k">R4</td><td>Allow users to compare their current results with previous years/past attempts, including category-wise progress. Show whether the user's teaching-practice scores have improved, decreased, or stayed similar. This can be displayed using graphs/charts on the dashboard.</td></tr>
+      <tr><td class="k">R5</td><td>Each evaluation/session should have a 10-minute session time. The system needs to manage what happens when that session expires.</td></tr>
+      <tr><td class="k">R6</td><td>The evaluation should remain anonymous while the session is in progress. Only after the session is completed should the system store the evaluation data.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <span class="lbl">Interpretation agreed during the sprint</span>
+    <p>An early reading of R5 as an idle sign-out for account holders was replaced once the
+    client's wording made clear that the ten minutes apply to each evaluation. An early reading
+    of R3 as "one result per year, replaced automatically" was replaced by the client's
+    "current and previous, with the option to delete the previous". Both earlier versions were
+    superseded before release; the database migration was rewritten before it was run on the
+    live system (Section 12, defect 1).</p>
+  </div>
+</section>
+
+
+<!-- ============================ 03 PROCESS ============================ -->
+<section>
+  <h2><span class="n">03</span>Sprint process</h2>
+  <p class="sub">How the sprint was planned, tracked and closed.</p>
+
+  <p>
+    The team works in Scrum with the client as the single source of requirements. Sprint planning
+    took the client's six numbered requirement areas (Section 02) as the sprint goal and broke them
+    into the backlog below. A story closed only when its acceptance criterion in Section 13 had
+    evidence — a database test, a browser check, a network trace or a read-only probe against the
+    live system. Two clarifications of the client's wording (R3 and R5, Section 02) arrived
+    mid-sprint; both were absorbed before release rather than deferred.
+  </p>
+
+  <div class="callout">
+    <span class="lbl">Sprint goal</span>
+    <p>Give returning participants a trustworthy view of their practice over time — current and
+    previous attempts, three years of history, change by category — while keeping every
+    evaluation private and unstored until it is complete.</p>
+  </div>
+
+  <h3>Sprint backlog</h3>
+  <table class="data compact breakable">
+    <thead><tr><th style="width:6%">#</th><th>Story</th><th style="width:15%">Origin</th><th style="width:12%">Status</th></tr></thead>
+    <tbody>
+      <tr><td class="k">S1</td><td>As a signed-in participant, I want a dashboard of my results so that my active result and history are in one place.</td><td>R1</td><td><span class="pill done">Done</span></td></tr>
+      <tr><td class="k">S2</td><td>As a signed-in participant, I want my evaluations kept for three years so that I can look back across several years.</td><td>R2</td><td><span class="pill done">Done</span></td></tr>
+      <tr><td class="k">S3</td><td>As a participant with two attempts in a year, I want the newest to be my active result and the earlier one kept as the previous attempt, so that a retake behaves predictably.</td><td>R3</td><td><span class="pill done">Done</span></td></tr>
+      <tr><td class="k">S4</td><td>As a participant, I want to delete or override my previous attempt so that only my current attempt is used.</td><td>R3</td><td><span class="pill done">Done</span></td></tr>
+      <tr><td class="k">S5</td><td>As a participant, I want to compare my current result with any past attempt, category by category, and see whether I improved, decreased or stayed similar.</td><td>R4</td><td><span class="pill done">Done</span></td></tr>
+      <tr><td class="k">S6</td><td>As a participant, I want year-to-year change shown as charts on my dashboard.</td><td>R4</td><td><span class="pill done">Done</span></td></tr>
+      <tr><td class="k">S7</td><td>As a participant, I want ten minutes per evaluation, with clear warnings and a defined outcome when time runs out.</td><td>R5</td><td><span class="pill done">Done</span></td></tr>
+      <tr><td class="k">S8</td><td>As an anonymous participant, I want nothing stored until I submit, so that an abandoned evaluation leaves no trace.</td><td>R6</td><td><span class="pill done">Done</span></td></tr>
+      <tr><td class="k">S9</td><td>As the client, I want the platform to look and read like a research instrument and to work on phones.</td><td>Added in sprint</td><td><span class="pill done">Done</span></td></tr>
+      <tr><td class="k">S10</td><td>Restore the paused production database and apply the outstanding Sprint 3 and Sprint 4 migrations.</td><td>Unplanned (Section 04)</td><td><span class="pill done">Done</span></td></tr>
+      <tr><td class="k">S11</td><td>As a participant, I want verification codes and results emails to arrive reliably.</td><td>Carried over</td><td><span class="pill sched">Sprint 5</span></td></tr>
+    </tbody>
+  </table>
+
+  <h3>Definition of Done applied this sprint</h3>
+  <ul>
+    <li>A rule is enforced in the database wherever one exists, not only in the browser.</li>
+    <li>Automated database checks pass on a fresh schema and when applied over the previous migration.</li>
+    <li>Behaviour is verified in the browser, including phone width and screen-reader announcements.</li>
+    <li>The change is deployed to the live site and confirmed with read-only requests against the production database.</li>
+    <li>The change is documented in this report with evidence against its acceptance criterion.</li>
+  </ul>
+</section>
+
+<!-- ============================ 03 RECOVERY ============================ -->
+<section class="keep">
+  <h2><span class="n">04</span>Production recovery</h2>
+  <p class="sub">Context for the sprint: the live platform was not working when work began.</p>
+
+  <p>
+    At the start of the sprint, sign-in and anonymous participation both failed on the live
+    site. Investigation showed the fault was not in the application: the database host name
+    returned <code>NXDOMAIN</code> from two independent DNS resolvers (Google and Cloudflare).
+    The Supabase free-tier project had been paused after a period of inactivity, which removes
+    its public address. The command-line access token recorded in the handover notes had also
+    been revoked, so migrations could not be applied from the command line.
+  </p>
+
+  <table class="data">
+    <thead><tr><th style="width:20%">Step</th><th>Action and result</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Diagnosis</td><td>DNS lookups, authentication health and REST probes confirmed the project was unreachable rather than misconfigured.</td></tr>
+      <tr><td class="k">Recovery</td><td>The project was restored from the Supabase dashboard and returned healthy (authentication settings unchanged: email sign-up and anonymous sign-in enabled).</td></tr>
+      <tr><td class="k">Migrations</td><td>The outstanding Sprint 3 migration and the Sprint 4 migration were applied in order through the SQL editor (Figure 9).</td></tr>
+      <tr><td class="k">Verification</td><td>Six read-only requests against the live database confirmed every server-side rule (Section 13).</td></tr>
+      <tr><td class="k">Hardening</td><td>Sign-in and registration now report "Can't reach the sign-in service" instead of a raw "Failed to fetch" when the backend is unavailable.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <span class="lbl">Lesson for handover</span>
+    <p>Free Supabase projects pause after one week without activity. A scheduled keep-alive
+    request and a regular data export are recorded as outstanding items (Section 15).</p>
+  </div>
+</section>
+
+<!-- ============================ 04 DASHBOARD ============================ -->
+<section>
+  <h2><span class="n">05</span>User dashboard and three-year history — R1, R2</h2>
+
+  <p>
+    Signed-in participants have a dashboard page (<code>my-results.html</code>, linked as
+    "Dashboard" in the navigation). It is built from the participant's stored attempts, read
+    under row-level security so each user can only ever load their own rows.
+  </p>
+
+  <figure class="narrow">
+    <img src="PEP_Sprint4_Report_assets/fig-dashboard.png" alt="">
+    <figcaption><b>Figure 1.</b> User dashboard: active result, overall progress against the previous attempt, and stored history. Test account with sample attempts.</figcaption>
+  </figure>
+
+  <h3>Dashboard contents</h3>
+  <table class="data compact">
+    <thead><tr><th style="width:26%">Area</th><th>Content</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Summary</td><td>Active result (overall score and descriptor), overall progress label against the selected comparison, number of attempts and the date the oldest will be removed.</td></tr>
+      <tr><td class="k">Current vs previous</td><td>Selector for any earlier attempt; per-category rows with before and after scores, trend label and paired bars; comparison bar chart (Section 07).</td></tr>
+      <tr><td class="k">Year-to-year progress</td><td>Line chart and table of each year's result for up to three years (Section 07).</td></tr>
+      <tr><td class="k">All attempts</td><td>Every stored attempt with its status (Active result, Previous attempt, or year result), category scores, a link to its full report, and Delete for any attempt except the active result.</td></tr>
+      <tr><td class="k">Other states</td><td>Signed-out, no attempts yet, and could-not-load messages, each with a clear next action.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Three-year retention</h3>
+  <ul>
+    <li>The dashboard query only reads attempts completed within the last three years.</li>
+    <li>The database function <code>purge_expired_assessments()</code> deletes any session older than three years. It runs on every submission and, where the <code>pg_cron</code> extension is available, daily at 03:15.</li>
+    <li>Deleting a session cascades to its responses and demographics, so no orphaned answers remain.</li>
+  </ul>
+</section>
+
+<!-- ============================ 05 ATTEMPTS ============================ -->
+<section>
+  <h2><span class="n">06</span>Current and previous attempts — R3</h2>
+
+  <table class="data compact">
+    <thead><tr><th style="width:34%">Rule</th><th>Behaviour</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Active result</td><td>The newest completed attempt is always the active result.</td></tr>
+      <tr><td class="k">Previous attempt</td><td>The next most recent attempt in the same calendar year (Australia/Melbourne) is kept for comparison.</td></tr>
+      <tr><td class="k">Limit</td><td>At most two attempts per year; submitting a third removes the oldest of that year.</td></tr>
+      <tr><td class="k">Delete / override at submission</td><td>After a second attempt, the completion screen asks whether to keep both or delete the previous attempt.</td></tr>
+      <tr><td class="k">Delete later</td><td>The dashboard offers Delete on any attempt except the active result.</td></tr>
+      <tr><td class="k">After deletion</td><td>Only the current attempt remains active; admin averages count one attempt per participant per year.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="fig-row two" style="align-items:start">
+    <figure style="margin-top:0">
+      <img src="PEP_Sprint4_Report_assets/fig-two-attempts-live.png" alt="">
+      <figcaption><b>Figure 2.</b> <span class="live">LIVE</span> Completion screen after a second attempt on the live site with a real account: the new attempt (86) is active, the previous attempt (91) is kept, and the participant chooses to keep both or delete it.</figcaption>
+    </figure>
+    <div>
+      <figure style="margin-top:0">
+        <img src="PEP_Sprint4_Report_assets/fig-attempts-before.png" alt="">
+        <figcaption><b>Figure 3a.</b> Dashboard attempts before deletion: active result and previous attempt.</figcaption>
+      </figure>
+      <figure>
+        <img src="PEP_Sprint4_Report_assets/fig-attempts-after.png" alt="">
+        <figcaption><b>Figure 3b.</b> After "Delete": the previous attempt is removed; only the current attempt is active.</figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <h3>Enforcement</h3>
+  <p>
+    Both rules are enforced by database functions, not only by the interface.
+    <code>submit_assessment()</code> applies the two-per-year limit, and accepts a
+    <code>p_replace_previous</code> flag that removes all earlier same-year attempts in the same
+    transaction. <code>delete_previous_attempt()</code> deletes one of the caller's own attempts
+    and refuses when that attempt is the caller's most recent — so the active result cannot be
+    removed, whether by mistake or by a crafted request.
+  </p>
+</section>
+
+<!-- ============================ 06 COMPARISON ============================ -->
+<section>
+  <h2><span class="n">07</span>Historical comparison — R4</h2>
+
+  <p>
+    The comparison defaults to the previous attempt in the current year, or, if there is none,
+    the most recent attempt from an earlier year. Any earlier attempt can be selected. Each
+    category and the overall score receive one of three labels:
+  </p>
+  <table class="data compact">
+    <thead><tr><th style="width:24%">Label</th><th>Rule</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Improved ▲</td><td>Score rose by more than 2 points.</td></tr>
+      <tr><td class="k">Decreased ▼</td><td>Score fell by more than 2 points.</td></tr>
+      <tr><td class="k">Stayed similar ●</td><td>Change of 2 points or less, so small fluctuations are not presented as progress or decline.</td></tr>
+    </tbody>
+  </table>
+
+  <figure>
+    <img src="PEP_Sprint4_Report_assets/fig-compare.png" alt="">
+    <figcaption><b>Figure 4.</b> Category-wise comparison showing all three labels — Teaching Practice improved (+8), Pedagogical Development decreased (−8), Technology Adoption stayed similar (+2) — with the comparison bar chart. Sample data.</figcaption>
+  </figure>
+
+  <figure>
+    <img src="PEP_Sprint4_Report_assets/fig-years.png" alt="">
+    <figcaption><b>Figure 5.</b> Year-to-year progress: each year's result (the newest attempt in that year) for up to three years, as a line chart per category and overall, with a table stating the change from the previous year. Sample data.</figcaption>
+  </figure>
+</section>
+
+<!-- ============================ 07 SESSION ============================ -->
+<section>
+  <h2><span class="n">08</span>Ten-minute session — R5</h2>
+
+  <h3>Behaviour</h3>
+  <table class="data compact">
+    <thead><tr><th style="width:24%">Stage</th><th>Behaviour</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Start</td><td>The clock starts when the participant begins the evaluation. The start time is kept in the browser, so refreshing, closing the tab or opening a second tab does not reset it.</td></tr>
+      <tr><td class="k">Running</td><td>The remaining time is shown in the progress bar throughout the questions and the review screen.</td></tr>
+      <tr><td class="k">Warnings</td><td>At two minutes the timer turns amber and at one minute red; each threshold is also announced to screen readers.</td></tr>
+      <tr><td class="k">Expiry</td><td>Unsubmitted answers are cleared from the device, nothing is stored or emailed, and an expiry screen offers a new session or a return home. A participant returning after the time has passed sees the same screen.</td></tr>
+      <tr><td class="k">Server check</td><td><code>submit_assessment()</code> rejects any submission more than ten minutes after the recorded start (plus one minute's grace for slow connections) with <code>SESSION_EXPIRED</code>, and rejects a missing or future start time.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="fig-row two" style="grid-template-columns:1.35fr 1fr; align-items:start">
+    <div>
+      <div class="cap">Running</div>
+      <img src="PEP_Sprint4_Report_assets/fig-timer-running.png" alt="">
+    </div>
+    <div class="stack">
+      <div><div class="cap">Final minute</div><img src="PEP_Sprint4_Report_assets/fig-timer-warning.png" alt=""></div>
+      <div><div class="cap">Expired — nothing stored</div><img src="PEP_Sprint4_Report_assets/fig-timer-expired.png" alt=""></div>
+    </div>
+  </div>
+  <figure style="margin-top:1mm"><figcaption><b>Figure 6.</b> Session states: countdown during a question, the final-minute warning, and the expiry screen.</figcaption></figure>
+
+  <div class="callout">
+    <span class="lbl">Known limitation</span>
+    <p>The start time is reported by the browser. The server check prevents ordinary
+    circumvention (refreshing, reopening, submitting late), but a technically skilled user could
+    alter the reported start time. This is appropriate for a reflective self-assessment; exam-grade
+    enforcement would need a server-issued session token, which would conflict with R6 for
+    anonymous participants.</p>
+  </div>
+</section>
+
+<!-- ============================ 08 ANONYMOUS ============================ -->
+<section class="keep">
+  <h2><span class="n">09</span>Anonymous until completion — R6</h2>
+
+  <p>
+    Before Sprint 4, choosing "Continue anonymously" created an anonymous authentication account
+    and a profile row, and beginning the questionnaire created a session row — so data existed
+    before the evaluation was complete. Both behaviours were removed:
+  </p>
+  <ul>
+    <li>Anonymous participants are not signed in to the backend at all; any existing sign-in on the device is ended first.</li>
+    <li>No session row is created when an evaluation starts, for anonymous or signed-in participants.</li>
+    <li>Answers remain only on the participant's device until submission.</li>
+    <li>On submission, a single call to <code>submit_assessment()</code> stores the session and all twenty responses in one transaction, with no user attached for anonymous participants.</li>
+  </ul>
+
+  <table class="data compact">
+    <thead><tr><th style="width:34%">Observed during a full anonymous run</th><th>Network requests to the backend</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Answering all twenty statements</td><td>0</td></tr>
+      <tr><td class="k">Review screen</td><td>0</td></tr>
+      <tr><td class="k">Submission</td><td>1 database call (<code>rpc/submit_assessment</code>), then the results email request</td></tr>
+      <tr><td class="k">Session expired before submission</td><td>0</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============================ 09 ARCHITECTURE ============================ -->
+<section>
+  <h2><span class="n">10</span>Architecture and data model</h2>
+
+  <p>
+    The platform remains a static front end (HTML, CSS and vanilla JavaScript on GitHub Pages)
+    over Supabase (PostgreSQL, authentication, edge functions). Sprint 4 moved the evaluation
+    rules into the database so they hold regardless of the client.
+  </p>
+
+  <h3>Write path for a completed evaluation</h3>
+<pre>submit_assessment(p_responses jsonb, p_started_at timestamptz,
+                  p_replace_previous boolean default false,
+                  p_participant_email text default null) returns jsonb
+
+ 1  reject a missing/future start time; reject if now − start &gt; 10 min + 1 min grace
+ 2  require exactly the active questions (20), each answered 1–5; reject extra keys
+ 3  recalculate the four category scores from the answers (client scores are ignored)
+ 4  insert the session and all responses in one transaction
+ 5  signed-in only: remove abandoned in-progress rows; keep at most two attempts this
+    year (or remove all earlier ones when p_replace_previous)
+ 6  purge sessions older than three years
+ 7  return { session_id, scores, year, previous_id, removed }</pre>
+
+  <table class="data compact">
+    <thead><tr><th style="width:32%">Database object</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td class="k"><code>submit_assessment()</code></td><td>Only write path for evaluations. <code>SECURITY DEFINER</code>; executable by anonymous and signed-in roles.</td></tr>
+      <tr><td class="k"><code>delete_previous_attempt()</code></td><td>Deletes one of the caller's own attempts; refuses the most recent. Signed-in role only.</td></tr>
+      <tr><td class="k"><code>purge_expired_assessments()</code></td><td>Three-year retention. Not executable from the web roles.</td></tr>
+      <tr><td class="k"><code>idx_sessions_user_completed</code></td><td>Index on (user_id, completed_at) for history queries.</td></tr>
+      <tr><td class="k"><code>handle_new_user()</code> (revised)</td><td>Account-creation trigger; now frees an email held by an orphaned profile row (Section 12, defect 6).</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Client modules</h3>
+  <table class="data compact">
+    <thead><tr><th style="width:26%">File</th><th>Responsibility</th></tr></thead>
+    <tbody>
+      <tr><td class="k"><code>js/session.js</code></td><td>Participant identity, sign-out, and the ten-minute session clock (<code>PED.evalSession</code>). Clears a different participant's answers on shared devices.</td></tr>
+      <tr><td class="k"><code>js/assessment.js</code></td><td>Submission via <code>submit_assessment()</code>, attempt history, deletion; falls back to direct inserts if the migration is absent.</td></tr>
+      <tr><td class="k"><code>js/questionnaire.js</code></td><td>Timer display, warnings and expiry; attempt notes on the welcome screen; keep/delete choice on completion.</td></tr>
+      <tr><td class="k"><code>js/my-results.js</code></td><td>Dashboard rendering, comparison logic and charts (Chart.js).</td></tr>
+      <tr><td class="k"><code>send-results-email</code></td><td>Edge function: emails a results summary only for a session completed in the last 30 minutes, using stored scores.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Migration safety</h3>
+  <p>
+    <code>sprint4-attempts.sql</code> is idempotent and was tested both on a fresh schema and
+    applied over its own earlier draft. A one-off clean-up keeps at most two attempts per user per
+    year, removes abandoned in-progress rows older than a day, and applies the three-year purge.
+  </p>
+</section>
+
+<!-- ============================ 10 REDESIGN ============================ -->
+<section>
+  <h2><span class="n">11</span>Interface redesign</h2>
+
+  <p>
+    The previous interface (dark theme, decorative animation, custom cursor, film grain, 3D card
+    tilt) was visually striking but read as a template and was harder to use for a research
+    instrument. All seven pages — home, questionnaire, demographics, results, report, user
+    dashboard and admin — were rebuilt on a shared design system in <code>css/main.css</code>.
+  </p>
+
+  <div class="fig-row two">
+    <div><div class="cap">Before Sprint 4</div><img src="PEP_Sprint4_Report_assets/fig-home-before.png" alt=""></div>
+    <div><div class="cap">Sprint 4</div><img src="PEP_Sprint4_Report_assets/fig-home-after.png" alt=""></div>
+  </div>
+  <figure style="margin-top:1mm"><figcaption><b>Figure 7.</b> Home page before and after. The first statement can be answered directly on the home page and carries into the evaluation.</figcaption></figure>
+
+  <table class="data compact">
+    <thead><tr><th style="width:26%">Aspect</th><th>Decision</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Visual language</td><td>Light theme, one blue accent, restrained depth (layered shadows, tactile buttons and answer options).</td></tr>
+      <tr><td class="k">Typography</td><td>IBM Plex Sans for text; IBM Plex Mono for scores, codes and the timer.</td></tr>
+      <tr><td class="k">Colour meaning</td><td>The four framework category colours are used only to encode data (badges, charts).</td></tr>
+      <tr><td class="k">Accessibility</td><td>WCAG AA text contrast, visible keyboard focus, skip link, reduced-motion support, layouts verified at 390 px width.</td></tr>
+      <tr><td class="k">Removed code</td><td>Custom cursor script, GSAP animation library, 3D tilt, decorative gradients and grain.</td></tr>
+      <tr><td class="k">Admin</td><td>Shares the site's tokens and components; averages count only each participant's active attempt per year.</td></tr>
+    </tbody>
+  </table>
+
+  <figure class="narrow">
+    <img src="PEP_Sprint4_Report_assets/fig-admin.png" alt="">
+    <figcaption><b>Figure 8.</b> Redesigned administrator dashboard. Sample data.</figcaption>
+  </figure>
+</section>
+
+<!-- ============================ 11 QA ============================ -->
+<section>
+  <h2><span class="n">12</span>Quality assurance</h2>
+  <p class="sub">Defects found during development and review, all fixed and re-verified before release.</p>
+
+  <div class="defect">
+    <h4>1 &nbsp;Draft migration would have deleted same-year attempts</h4>
+    <div class="meta">Severity: high · Area: database</div>
+    <p>The first version of the attempt migration replaced a user's same-year result automatically, and its clean-up step deleted all but one attempt per year — contrary to the refined R3. It was rewritten before being run on the live database, and the new version was tested applied over the old one.</p>
+  </div>
+  <div class="defect">
+    <h4>2 &nbsp;Anonymous participation wrote data before completion</h4>
+    <div class="meta">Severity: high · Area: authentication, persistence</div>
+    <p>Starting anonymously created an authentication account and profile row, and beginning the questionnaire created a session row, contrary to R6. Removed; verified with a network trace (Section 09).</p>
+  </div>
+  <div class="defect">
+    <h4>3 &nbsp;Results email function could send arbitrary email</h4>
+    <div class="meta">Severity: high · Area: edge function</div>
+    <p>The function accepted scores and a recipient from any caller, so it could be used to send emails with fabricated content to any address. It now sends only for a session completed in the last 30 minutes, uses the scores stored in the database, and escapes participant-supplied text.</p>
+  </div>
+  <div class="defect">
+    <h4>4 &nbsp;Admin averages could count a participant twice</h4>
+    <div class="meta">Severity: medium · Area: admin dashboard</div>
+    <p>With a previous attempt kept, both attempts entered the category averages. The admin dashboard now counts only the newest attempt per participant per year.</p>
+  </div>
+  <div class="defect">
+    <h4>5 &nbsp;Home-page statement card overflowed on phones</h4>
+    <div class="meta">Severity: medium · Area: responsive layout</div>
+    <p>At 375 px width the fifth answer option was cut off because grid items would not shrink below their content width. Fixed and verified on a 390 px viewport.</p>
+  </div>
+  <div class="defect">
+    <h4>6 &nbsp;"Database error creating new user"</h4>
+    <div class="meta">Severity: medium · Area: authentication trigger</div>
+    <p>Creating an account failed when an old profile row (whose account had been deleted) still held the same email, violating the unique email constraint. The account-creation trigger now frees the email from orphaned rows. Reproduced and fixed in a test database (<code>fix-new-user-trigger.sql</code>).</p>
+  </div>
+  <div class="defect">
+    <h4>7 &nbsp;"Continue" button visible before answering; unclear outage errors; wrong category label in emails</h4>
+    <div class="meta">Severity: low · Area: interface, email</div>
+    <p>A stylesheet rule overrode the <code>hidden</code> attribute; sign-in showed "Failed to fetch" during outages; emails labelled PD as "Professional Development". All corrected.</p>
+  </div>
+</section>
+
+<!-- ============================ 12 TESTING ============================ -->
+<section>
+  <h2><span class="n">13</span>Testing and acceptance</h2>
+
+  <h3>Database — 48 automated checks</h3>
+  <p>
+    The migration was executed with PGlite (PostgreSQL compiled to WebAssembly) against the full
+    schema chain — <code>supabase-setup.sql</code>, <code>admin-policies.sql</code>,
+    <code>sprint3-demographics.sql</code>, <code>sprint4-attempts.sql</code> — with mocked
+    authentication functions for anonymous, signed-in and anonymous-token callers. The suite ran
+    on a fresh database and over the earlier draft of the migration (24 checks each, every
+    migration applied twice). All passed. Coverage: storage on completion only; expired, future
+    and missing start times; grace period; incomplete, out-of-range, non-integer, string and
+    extra answers; two attempts per year with the oldest removed; replace-previous; deleting a
+    previous attempt; refusal to delete the active result; refusal across users; cascade of
+    responses; three-year purge; permission denied on the purge function for web roles.
+  </p>
+
+  <h3>Browser — end to end</h3>
+  <ul>
+    <li>Dashboard with full history, a single attempt, and no attempts; switching the comparison; all three trend labels; deleting a previous attempt.</li>
+    <li>Timer at start, at two minutes, at one minute, expiry during a question and expiry on return; screen-reader announcements.</li>
+    <li>Anonymous run with request monitoring (Section 09); completion-screen keep/delete choice.</li>
+    <li>Sign-in behaviour with the backend unreachable; mobile layout at 390 px; 18 page states captured with no JavaScript errors.</li>
+  </ul>
+
+  <h3>Live system</h3>
+  <table class="data compact">
+    <thead><tr><th style="width:48%">Request to the live database (writes nothing)</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td>Submit an incomplete evaluation</td><td>Rejected — "All 20 questions must be answered"</td></tr>
+      <tr><td>Submit a session started 20 minutes earlier</td><td>Rejected — <code>SESSION_EXPIRED</code></td></tr>
+      <tr><td>Delete an attempt without signing in</td><td>Refused — "Sign in to manage your attempts"</td></tr>
+      <tr><td>Call the purge function from the web</td><td>Permission denied</td></tr>
+      <tr><td>Read the demographics table</td><td>Present (Sprint 3 migration applied)</td></tr>
+      <tr><td>Read sessions without signing in</td><td>No rows returned (row-level security)</td></tr>
+    </tbody>
+  </table>
+  <p>In addition, a real account completed two attempts on the live site and received the keep/delete choice (Figure 2).</p>
+
+  <figure class="half">
+    <img src="PEP_Sprint4_Report_assets/fig-sql-live.png" alt="">
+    <figcaption style="text-align:center"><b>Figure 9.</b> <span class="live">LIVE</span> Sprint 4 migration completing in the Supabase SQL editor on the production database.</figcaption>
+  </figure>
+</section>
+
+<section class="newpage">
+  <h2><span class="n">13 · continued</span>Acceptance criteria</h2>
+  <p class="sub">Each acceptance criterion derived from the client's Sprint 4 wording, with its evidence.</p>
+
+  <table class="data breakable">
+    <thead><tr><th style="width:5%">#</th><th style="width:33%">Criterion</th><th>How it is met</th><th style="width:21%">Evidence</th><th style="width:9%">Result</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td class="k">Create a UI/dashboard for the user</td><td>Dashboard page for signed-in participants</td><td>§05, Fig. 1</td><td><span class="pill done">Met</span></td></tr>
+      <tr><td>2</td><td class="k">Store and display data for up to 3 years</td><td>Three-year window; automatic purge</td><td>§05, DB tests</td><td><span class="pill done">Met</span></td></tr>
+      <tr><td>3</td><td class="k">Compare with previous years / past attempts, category-wise</td><td>Comparison selector; per-category rows</td><td>§07, Fig. 4</td><td><span class="pill done">Met</span></td></tr>
+      <tr><td>4</td><td class="k">Handle previous and current attempts properly</td><td>Newest active; previous kept; two per year</td><td>§06, Fig. 2, live</td><td><span class="pill done">Met</span></td></tr>
+      <tr><td>5</td><td class="k">Option to delete/override the previous attempt</td><td>At submission and on the dashboard; replace flag</td><td>§06, Fig. 2–3, DB tests</td><td><span class="pill done">Met</span></td></tr>
+      <tr><td>6</td><td class="k">If deleted, only the current attempt is active</td><td>Active result undeletable; others removed</td><td>§06, Fig. 3b, DB tests</td><td><span class="pill done">Met</span></td></tr>
+      <tr><td>7</td><td class="k">Compare year-to-year or past data</td><td>Year-to-year chart and table</td><td>§07, Fig. 5</td><td><span class="pill done">Met</span></td></tr>
+      <tr><td>8</td><td class="k">Show improved, decreased or stayed similar</td><td>Trend labels with a ±2-point band</td><td>§07, Fig. 4</td><td><span class="pill done">Met</span></td></tr>
+      <tr><td>9</td><td class="k">Display using graphs/charts on the dashboard</td><td>Comparison bar chart; year-to-year line chart</td><td>§07, Fig. 4–5</td><td><span class="pill done">Met</span></td></tr>
+      <tr><td>10</td><td class="k">Each evaluation has a 10-minute session</td><td>Visible countdown; server time check</td><td>§08, Fig. 6, live</td><td><span class="pill done">Met</span></td></tr>
+      <tr><td>11</td><td class="k">Manage what happens when a session expires</td><td>Warnings; answers cleared; nothing stored; restart</td><td>§08, Fig. 6</td><td><span class="pill done">Met</span></td></tr>
+      <tr><td>12</td><td class="k">Anonymous while the session is in progress</td><td>No sign-in or writes during the evaluation</td><td>§09, network trace</td><td><span class="pill done">Met</span></td></tr>
+      <tr><td>13</td><td class="k">Store data only after the session is completed</td><td>Single transactional submission</td><td>§09–10, DB tests</td><td><span class="pill done">Met</span></td></tr>
+    </tbody>
+  </table>
+</section>
+
+
+<!-- ============================ 14 RISKS ============================ -->
+<section class="keep">
+  <h2><span class="n">14</span>Risks and limitations</h2>
+  <p class="sub">Known risks carried into handover, with the mitigation in place or planned.</p>
+
+  <table class="data compact">
+    <thead><tr><th style="width:26%">Risk</th><th style="width:26%">Consequence</th><th>Mitigation</th><th style="width:12%">Status</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Session start time is reported by the browser</td><td>A technically skilled participant could extend a session.</td><td>The server rejects late submissions. Exam-grade enforcement would need a server-issued token, which conflicts with R6 for anonymous participants.</td><td><span class="pill done">Accepted</span></td></tr>
+      <tr><td class="k">Free-tier database pauses after seven idle days</td><td>Sign-in and submission fail while paused.</td><td>Daily keep-alive request; answers stay on the device until submission; sign-in shows a clear outage message.</td><td><span class="pill sched">Outstanding</span></td></tr>
+      <tr><td class="k">No automatic backups on the free plan</td><td>Data loss on project failure is unrecoverable.</td><td>Regular CSV export from the admin dashboard, or a paid plan.</td><td><span class="pill sched">Outstanding</span></td></tr>
+      <tr><td class="k">Anonymous attempts have no owner</td><td>An anonymous participant's data cannot be located for deletion on request.</td><td>A consequence of R6. Anonymous rows expire under the three-year purge.</td><td><span class="pill done">Accepted</span></td></tr>
+      <tr><td class="k">Credentials recorded in the handover notes</td><td>Anyone holding the notes has full access.</td><td>Rotate keys, tokens and admin passwords before handover; the notes are excluded from the repository.</td><td><span class="pill risk">Required</span></td></tr>
+      <tr><td class="k">Email sender not yet configured</td><td>Verification codes and results emails may not arrive.</td><td>The function is provider-independent; configure the project sender (Section 15).</td><td><span class="pill sched">Outstanding</span></td></tr>
+      <tr><td class="k">Front-end libraries load from public CDNs</td><td>A CDN outage affects charts and PDF export.</td><td>Versions are pinned; self-hosting is a candidate for handover.</td><td><span class="pill done">Accepted</span></td></tr>
+      <tr><td class="k">Build and deployment knowledge held by one team member</td><td>Slow recovery if that person is unavailable.</td><td>Written handover guide planned for Sprint 5.</td><td><span class="pill sched">Sprint 5</span></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============================ 13 DEPLOYMENT ============================ -->
+<section>
+  <h2><span class="n">15</span>Deployment and outstanding items</h2>
+
+  <h3>Releases</h3>
+  <table class="data compact">
+    <thead><tr><th style="width:12%">Commit</th><th style="width:15%">Date</th><th>Change</th></tr></thead>
+    <tbody>
+      <tr><td><code>98f6586</code></td><td class="nw">13 Sep 2026</td><td>Home page redesign; initial attempt rules and session handling; yearly results page</td></tr>
+      <tr><td><code>f9abeef</code></td><td class="nw">13 Sep 2026</td><td>User dashboard, current/previous attempts, ten-minute sessions, store on completion</td></tr>
+      <tr><td><code>9ec0cf3</code></td><td class="nw">13 Sep 2026</td><td>Redesign of every page on the shared design system</td></tr>
+      <tr><td><code>7646f38</code></td><td class="nw">13 Sep 2026</td><td>Refined depth and branding</td></tr>
+      <tr><td><code>8a11b51</code></td><td class="nw">14 Sep 2026</td><td>Results email function hardened</td></tr>
+      <tr><td><code>ca23387</code></td><td class="nw">14 Sep 2026</td><td>Email transport made provider-independent (SMTP or API)</td></tr>
+    </tbody>
+  </table>
+  <p>
+    Front-end releases deploy through GitHub Pages from <code>main</code>; asset URLs carry a
+    version parameter so browsers load the new files. Database changes were applied in the
+    Supabase SQL editor. One deployment was delayed by a GitHub Pages service incident and was
+    re-triggered once the service recovered.
+  </p>
+
+  <h3>Outstanding items</h3>
+  <table class="data breakable">
+    <thead><tr><th style="width:28%">Item</th><th>Detail</th><th style="width:14%">Status</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Email sender configuration</td><td>Configure a dedicated project email account as the Supabase authentication SMTP sender and as the edge-function secrets, then deploy the updated <code>send-results-email</code> function. Until then verification codes and results emails are not reliably delivered to all participants.</td><td><span class="pill sched">Outstanding</span></td></tr>
+      <tr><td class="k">Sign-up trigger fix</td><td>Confirm <code>fix-new-user-trigger.sql</code> has been applied to the live database.</td><td><span class="pill sched">Verify</span></td></tr>
+      <tr><td class="k">Credential rotation</td><td>Rotate the keys, tokens and admin passwords recorded in the handover notes before handover.</td><td><span class="pill risk">Required</span></td></tr>
+      <tr><td class="k">Database pausing</td><td>Add a daily keep-alive request so the free project does not pause again.</td><td><span class="pill sched">Outstanding</span></td></tr>
+      <tr><td class="k">Backups</td><td>The free plan has no automatic backups; export participant data (CSV) regularly or move to a paid plan.</td><td><span class="pill sched">Outstanding</span></td></tr>
+      <tr><td class="k">Ownership</td><td>Transfer the GitHub repository and Supabase project to university-owned accounts.</td><td><span class="pill sched">Sprint 5</span></td></tr>
+      <tr><td class="k">PDF export check</td><td>Re-test the report page's PDF export on the redesigned page.</td><td><span class="pill sched">Verify</span></td></tr>
+      <tr><td class="k">Team details</td><td>Following a change in team membership, the home page team section now matches this report (Product Owner Albin Roy; Tester Merajun Nabi). Ships with the next front-end release.</td><td><span class="pill sched">Next release</span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <span class="lbl">Considerations for the next sprint</span>
+    <p>Email from a university sender address; handover of accounts with rotated credentials;
+    a written handover guide (setup, migration order, administrators, recovery from pausing);
+    and research views that break scores down by demographic group.</p>
+  </div>
+</section>
+
+
+<!-- ============================ 16 RETROSPECTIVE ============================ -->
+<section class="retro">
+  <h2><span class="n">16</span>Retrospective</h2>
+  <p class="sub">What the team keeps, what it changes, and the actions carried into Sprint 5.</p>
+
+  <h3>What worked</h3>
+  <ul>
+    <li>Putting the evaluation rules in the database behind a single write path. Every rule held under the live probes, and the browser could be simplified because it no longer had to be trusted.</li>
+    <li>Testing the migration in PGlite before touching production. The suite caught the draft that would have deleted same-year attempts (Section 12, defect 1).</li>
+    <li>Verifying R6 with a network trace rather than by reading the code. It showed the anonymous sign-in and early session row that the code review had missed.</li>
+    <li>A shared design system. Seven pages were rebuilt in one release with a consistent look, and the admin dashboard inherited it for free.</li>
+  </ul>
+
+  <h3>What to change</h3>
+  <ul>
+    <li>Two requirements (R3, R5) were first built to an interpretation and then rebuilt to the client's wording. Confirm the wording in writing at planning before any migration is drafted.</li>
+    <li>The production database paused without anyone noticing. A live service needs a monitor, not a periodic manual check.</li>
+    <li>The team roster on the home page drifted from the sprint documents. Keep one source for team details and copy from it.</li>
+    <li>Sprint reports and slides were briefly published with the site. Documents that are not part of the product stay out of the published tree.</li>
+  </ul>
+
+  <h3>Actions for Sprint 5</h3>
+  <table class="data compact">
+    <thead><tr><th style="width:38%">Action</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Configure the project email sender and redeploy the results function</td><td>Closes the only outstanding requirement-level item (S11).</td></tr>
+      <tr><td class="k">Add a keep-alive request and a scheduled data export</td><td>Removes the two failure modes of the free tier (Section 14).</td></tr>
+      <tr><td class="k">Rotate every credential and hand ownership to university accounts</td><td>Required before the platform leaves the team.</td></tr>
+      <tr><td class="k">Write the handover guide</td><td>Setup, migration order, administrators and recovery from pausing, so the platform does not depend on one person.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============================ 17 REFERENCES ============================ -->
+<section class="keep refs">
+  <h2><span class="n">17</span>References</h2>
+  <p>Chart.js contributors. (2024). <em>Chart.js</em> (Version 4.4.1) [Computer software]. https://www.chartjs.org</p>
+  <p>ElectricSQL. (n.d.). <em>PGlite: Postgres in WebAssembly</em> [Computer software]. https://pglite.dev</p>
+  <p>Firmin, S. (2020). <em>Unravelling pedagogy: The role of technology in shaping IT academics' perceptions and application of teaching and philosophy</em> [Doctoral dissertation, Monash University]. ProQuest Dissertations &amp; Theses Global.</p>
+  <p>Supabase. (n.d.). <em>Supabase documentation</em>. https://supabase.com/docs</p>
+  <p>World Wide Web Consortium. (2023). <em>Web Content Accessibility Guidelines (WCAG) 2.1</em>. https://www.w3.org/TR/WCAG21/</p>
+</section>
+
+<!-- ============================ 14 APPENDIX ============================ -->
+<section class="newpage">
+  <h2><span class="n">18</span>Appendix — files added and modified</h2>
+
+  <table class="data compact breakable">
+    <thead><tr><th style="width:40%">File</th><th style="width:12%">Change</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>sprint4-attempts.sql</code></td><td>Added</td><td>Attempt rules, session limit, store on completion, retention</td></tr>
+      <tr><td><code>my-results.html</code>, <code>js/my-results.js</code>, <code>css/my-results.css</code></td><td>Added</td><td>User dashboard</td></tr>
+      <tr><td><code>js/session.js</code></td><td>Added</td><td>Identity and ten-minute session clock</td></tr>
+      <tr><td><code>js/landing.js</code></td><td>Added</td><td>Answerable first statement on the home page</td></tr>
+      <tr><td><code>supabase/templates/confirm-signup.html</code></td><td>Added</td><td>Verification-code email template</td></tr>
+      <tr><td><code>js/assessment.js</code>, <code>js/questionnaire.js</code></td><td>Modified</td><td>Submission, history, timer, expiry, attempt choice</td></tr>
+      <tr><td><code>js/auth.js</code></td><td>Modified</td><td>Anonymous start without sign-in; clearer errors</td></tr>
+      <tr><td><code>js/admin.js</code>, <code>admin.html</code>, <code>css/admin.css</code></td><td>Modified</td><td>Redesign; active attempts only in averages</td></tr>
+      <tr><td><code>js/results.js</code>, <code>js/report.js</code>, <code>js/questions.js</code></td><td>Modified</td><td>Chart colours and redesign</td></tr>
+      <tr><td><code>css/main.css</code> and page stylesheets</td><td>Modified</td><td>Shared design system</td></tr>
+      <tr><td>All page HTML files</td><td>Modified</td><td>Redesign, session script, versioned assets</td></tr>
+      <tr><td><code>supabase/functions/send-results-email/index.ts</code></td><td>Modified</td><td>Hardened, provider-independent results email</td></tr>
+      <tr><td><code>js/cursor.js</code></td><td>Removed</td><td>Decorative custom cursor</td></tr>
+      <tr><td><code>fix-new-user-trigger.sql</code>, <code>demo-sprint4-seed.sql</code></td><td>Added (local)</td><td>Account-creation fix; demonstration history for test accounts</td></tr>
+    </tbody>
+  </table>
+</section>
+
+</body>
+</html>

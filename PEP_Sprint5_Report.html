@@ -1,0 +1,1148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>PEP — Sprint 5 Technical Report</title>
+<!--
+  Source for PEP_Sprint5_Report.pdf. Figures live in PEP_Sprint5_Report_assets/.
+  To regenerate after editing, from this folder:
+
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
+      --headless --disable-gpu --no-pdf-header-footer \
+      --print-to-pdf="PEP_Sprint5_Report.pdf" --virtual-time-budget=4000 \
+      "file://$PWD/PEP_Sprint5_Report.html"
+
+  Then: python3 stamp_page_numbers.py PEP_Sprint5_Report.pdf
+-->
+<style>
+  @page { size: A4; margin: 18mm 16mm 16mm; }
+
+  :root {
+    --ink:      #17202C;
+    --body:     #2F3742;
+    --muted:    #667080;
+    --line:     #D3D8DF;
+    --line-2:   #E8EBEF;
+    --accent:   #1F5A96;
+    --accent-d: #174878;
+    --wash:     #F4F6F9;
+    --green:    #1E7A4E;
+    --amber:    #935F00;
+    --red:      #B42318;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body {
+    margin: 0;
+    font-family: "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+    font-size: 10.2pt;
+    line-height: 1.52;
+    color: var(--body);
+  }
+  h1, h2, h3, h4, .sans, figcaption, table.data th, .pill, .eyebrow {
+    font-family: -apple-system, "Helvetica Neue", Arial, sans-serif;
+  }
+  h1, h2, h3, h4 { color: var(--ink); margin: 0; font-weight: 700; }
+
+  /* ---------- Title page ---------- */
+  .cover { page-break-after: always; }
+  .rule-top { height: 3px; background: var(--accent); width: 58px; margin: 18mm 0 8mm; }
+  .eyebrow {
+    font-size: 7.6pt; letter-spacing: .2em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 4mm;
+  }
+  .cover h1 { font-size: 28pt; line-height: 1.05; letter-spacing: -.025em; margin-bottom: 3.5mm; }
+  .cover h1 em { font-style: normal; color: var(--accent); }
+  .cover .lede { font-size: 10.6pt; line-height: 1.5; max-width: 140mm; margin: 0 0 6mm; }
+
+  .cover-meta {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4mm 8mm;
+    border-top: 1px solid var(--line); padding-top: 4.5mm; margin: 0 0 5mm;
+  }
+  .cover-meta dt {
+    font-family: -apple-system, "Helvetica Neue", Arial, sans-serif;
+    font-size: 7.2pt; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 1.2mm;
+  }
+  .cover-meta dd { margin: 0; font-size: 10pt; color: var(--ink); font-weight: 600; }
+
+  .cover-split {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10mm;
+    border-top: 1px solid var(--line); padding-top: 5mm;
+  }
+  .cover-split table { width: 100%; border-collapse: collapse; }
+  .cover-split td { padding: 1mm 0; font-size: 8.8pt; border-bottom: 1px solid var(--line-2); }
+  .cover-split td:first-child { color: var(--ink); font-weight: 600; }
+  .cover-split td:last-child { color: var(--muted); text-align: right; }
+  .cover-split tr:last-child td { border-bottom: none; }
+  .toc td:last-child { color: var(--ink); font-weight: 600; text-align: left; }
+  .toc td.tocn {
+    font-family: -apple-system, "Helvetica Neue", Arial, sans-serif;
+    font-size: 8.2pt; color: var(--accent); font-weight: 700;
+    letter-spacing: .1em; width: 9mm; padding-right: 3mm;
+  }
+
+  /* ---------- Sections ---------- */
+  section { page-break-before: auto; }
+  h2 {
+    font-size: 14pt; letter-spacing: -.012em;
+    margin: 0 0 1.5mm; padding-bottom: 1.8mm;
+    border-bottom: 1.6px solid var(--ink);
+    page-break-after: avoid; page-break-inside: avoid;
+  }
+  section + section h2 { margin-top: 9mm; }
+  section.keep { page-break-inside: avoid; }
+  section.newpage { page-break-before: always; }
+  section.newpage h2 { margin-top: 0; }
+  h2 .n {
+    font-size: 8.2pt; color: var(--accent); letter-spacing: .16em;
+    display: block; margin-bottom: 1.2mm; font-weight: 700;
+  }
+  h3 { font-size: 10.4pt; margin: 5.5mm 0 1.8mm; page-break-after: avoid; }
+  p { margin: 0 0 2.6mm; }
+  .sub {
+    font-family: -apple-system, "Helvetica Neue", Arial, sans-serif;
+    color: var(--muted); font-size: 8.8pt; margin: -0.5mm 0 3.5mm;
+  }
+  ul, ol { margin: 0 0 3mm; padding-left: 5mm; }
+  li { margin-bottom: 1.4mm; }
+
+  code {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 8.3pt; background: var(--wash);
+    border: 1px solid var(--line-2); border-radius: 2px;
+    padding: 0.3mm 1.1mm; color: var(--accent-d);
+  }
+  pre {
+    font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 7.9pt; line-height: 1.45;
+    background: var(--wash); border: 1px solid var(--line-2); border-left: 2px solid var(--accent);
+    padding: 3mm 4mm; margin: 2mm 0 4mm; white-space: pre-wrap; page-break-inside: avoid; color: var(--ink);
+  }
+
+  table.data { width: 100%; border-collapse: collapse; margin: 2mm 0 4mm; page-break-inside: avoid; }
+  table.data th {
+    text-align: left; font-size: 7.2pt; letter-spacing: .13em; text-transform: uppercase;
+    color: var(--muted); font-weight: 600;
+    border-bottom: 1px solid var(--ink); padding: 0 3mm 1.8mm 0;
+  }
+  table.data td {
+    padding: 2mm 3mm 2mm 0; vertical-align: top;
+    border-bottom: 1px solid var(--line-2); font-size: 9.4pt;
+  }
+  table.data td:last-child, table.data th:last-child { padding-right: 0; }
+  table.data .k { font-weight: 600; color: var(--ink); }
+  table.data .nw { white-space: nowrap; }
+  table.data.compact td { padding-top: 1.4mm; padding-bottom: 1.4mm; font-size: 8.9pt; }
+  table.data.breakable { page-break-inside: auto; }
+  table.data.breakable tr { page-break-inside: avoid; }
+
+  .pill {
+    display: inline-block;
+    font-size: 7.2pt; font-weight: 700; letter-spacing: .09em; text-transform: uppercase;
+    padding: 0.6mm 1.8mm; border-radius: 2px; white-space: nowrap;
+  }
+  .pill.done  { color: var(--green); background: #E6F2EB; border: 1px solid #B4D6C2; }
+  .pill.sched { color: var(--amber); background: #FAF0DA; border: 1px solid #E0C08A; }
+  .pill.risk  { color: var(--red);   background: #FBEAE8; border: 1px solid #EBBDB8; }
+  .pill.plan  { color: var(--muted); background: #EEF0F3; border: 1px solid var(--line); }
+  .pill.done::before { content: "\2713\00a0"; }
+  .ticks { display: grid; grid-template-columns: 1fr 1fr; gap: 1.6mm 8mm; margin: 2mm 0 5mm; padding: 4mm 5mm; background: var(--wash); border-radius: 3px; }
+  .ticks div { display: flex; gap: 2.4mm; align-items: baseline; font-size: 9.4pt; }
+  .ticks .t { color: var(--green); font-weight: 700; font-family: -apple-system, "Helvetica Neue", Arial, sans-serif; }
+  .ticks b { color: var(--ink); }
+
+  .callout {
+    padding: 4mm 5mm; background: var(--wash);
+    border-left: 2px solid var(--accent); margin: 3mm 0 4mm;
+    page-break-inside: avoid; font-size: 9.7pt;
+  }
+  .callout p:last-child { margin-bottom: 0; }
+  .callout .lbl {
+    font-family: -apple-system, "Helvetica Neue", Arial, sans-serif;
+    font-size: 7.4pt; letter-spacing: .15em; text-transform: uppercase;
+    color: var(--accent-d); display: block; margin-bottom: 1.5mm; font-weight: 700;
+  }
+  .quote {
+    font-style: italic; color: var(--ink);
+    border-left: 2px solid var(--line); padding: 1mm 0 1mm 4mm; margin: 0 0 3.5mm;
+  }
+
+  .defect { page-break-inside: avoid; margin-bottom: 4.2mm; }
+  .defect h4 { font-size: 10pt; margin-bottom: 1mm; }
+  .defect .meta { font-family: "SF Mono", Menlo, monospace; font-size: 7.8pt; color: var(--muted); margin-bottom: 1.2mm; }
+
+  figure { margin: 3mm 0 5mm; page-break-inside: avoid; }
+  figure img { display: block; width: 100%; max-height: 112mm; object-fit: contain; object-position: top center; border: 1px solid var(--line); border-radius: 3px; }
+  figure.narrow img { width: 78%; margin: 0 auto; }
+  figure.half img { width: 46%; margin: 0 auto; }
+  figcaption { font-size: 8.2pt; color: var(--muted); margin-top: 1.8mm; line-height: 1.4; }
+  figcaption b { color: var(--ink); }
+  .fig-row { display: grid; gap: 3mm; page-break-inside: avoid; }
+  .fig-row.two { grid-template-columns: 1fr 1fr; }
+  .fig-row.three { grid-template-columns: 1fr 1fr 1fr; }
+  .fig-row img { border: 1px solid var(--line); border-radius: 3px; width: 100%; display: block; max-height: 95mm; object-fit: contain; object-position: top; }
+  .fig-row .cap { font-family: -apple-system, "Helvetica Neue", Arial, sans-serif; font-size: 7.6pt; color: var(--muted); margin-bottom: 1mm; }
+  .stack { display: grid; gap: 2mm; }
+  .live { font-family: -apple-system, "Helvetica Neue", Arial, sans-serif; font-size: 7pt; font-weight: 700; letter-spacing: .1em; color: var(--green); }
+  .rev { font-weight: 400; color: var(--muted); font-size: 8pt; }
+  .toc-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0 5mm; align-items: start; }
+  .refs p { margin: 0 0 2mm; padding-left: 8mm; text-indent: -8mm; font-size: 9.4pt; }
+  .retro ul { margin: 0 0 3mm; }
+</style>
+</head>
+<body>
+
+<!-- ============================ TITLE PAGE ============================ -->
+<div class="cover">
+  <div class="rule-top"></div>
+  <div class="eyebrow">Federation University Australia · ITECH3208 IT Capstone Project 1</div>
+  <h1>Sprint 5 <em>Technical Report.</em></h1>
+  <p class="lede">The Pedagogy Evaluation Platform is a web-based self-assessment tool built on Firmin's (2020)
+    Techno-Pedagogical Practice framework. In Sprint 5 we delivered the two requirements Dr Firmin
+    confirmed for the final development sprint: a participant can take the evaluation anonymously
+    and then save the result to a new or existing account, and new accounts are verified with a
+    6-digit code sent by email. Dr Firmin also asked for a question bank during the sprint, so
+    administrators can now edit the wording of the twenty statements from the admin dashboard.
+    After the review build we added a forgot-password flow, archive instead of delete, and time on task, each tested and released.</p>
+
+  <dl class="cover-meta">
+    <div><dt>Unit</dt><dd>ITECH3208 IT Capstone Project 1</dd></div>
+    <div><dt>Sprint</dt><dd>Sprint 5 · 28 September – 12 October 2026</dd></div>
+    <div><dt>Status</dt><dd>Implemented, deployed and verified</dd></div>
+    <div><dt>Date</dt><dd>15 October 2026</dd></div>
+    <div><dt>Live system</dt><dd>pedagogy-eval.vercel.app</dd></div>
+    <div><dt>Client</dt><dd>Dr Selena (Sally) Firmin</dd></div>
+  </dl>
+
+  <div class="cover-split">
+    <div>
+      <div class="eyebrow">Project team</div>
+      <table>
+        <tr><td>Mushfiqur Rahman</td><td>Lead Developer</td></tr>
+        <tr><td>Shafiullah Anik</td><td>Scrum Master</td></tr>
+        <tr><td>Albin Roy</td><td>Product Owner</td></tr>
+        <tr><td>Merajun Nabi</td><td>Tester</td></tr>
+      </table>
+    </div>
+    <div>
+      <div class="eyebrow">Contents</div>
+      <div class="toc-cols"><table class="toc"><tr><td class="tocn">01</td><td>Summary</td></tr><tr><td class="tocn">02</td><td>Sprint objectives</td></tr><tr><td class="tocn">03</td><td>Sprint process</td></tr><tr><td class="tocn">04</td><td>User stories</td></tr><tr><td class="tocn">05</td><td>Anonymous start, saved result</td></tr><tr><td class="tocn">06</td><td>Claim rules in the database</td></tr><tr><td class="tocn">07</td><td>Email verification code</td></tr><tr><td class="tocn">08</td><td>Question bank</td></tr><tr><td class="tocn">09</td><td>Forgot password</td></tr><tr><td class="tocn">10</td><td>Archive instead of delete</td></tr></table><table class="toc"><tr><td class="tocn">11</td><td>Time on task</td></tr><tr><td class="tocn">12</td><td>Architecture changes</td></tr><tr><td class="tocn">13</td><td>Quality assurance</td></tr><tr><td class="tocn">14</td><td>Testing and acceptance</td></tr><tr><td class="tocn">15</td><td>Risks and limitations</td></tr><tr><td class="tocn">16</td><td>Deployment and handover</td></tr><tr><td class="tocn">17</td><td>Retrospective</td></tr><tr><td class="tocn">18</td><td>References</td></tr><tr><td class="tocn">19</td><td>Appendix</td></tr></table></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================ 01 SUMMARY ============================ -->
+<section>
+  <h2><span class="n">01</span>Summary</h2>
+
+  <p>Sprint 5 had two confirmed requirements from the client: anonymous participation with the
+    option to keep the result in an account, and verification of new accounts by an emailed code.
+    Part-way through the sprint Dr Firmin also asked for a question bank, meaning the ability to
+    see all twenty statements in the admin panel and edit their wording. We built and released
+    that in the same sprint.</p>
+  <p>All three are implemented, deployed and verified against the twelve acceptance criteria we
+    derived from the client's wording (Section 14). A thirteenth item, a forgot-password flow, was
+    added on 13 October after we noticed the sign-in panel had no way to recover an account. It
+    was built, verified and released the same day (Section 09). A fourteenth followed on
+    14 October when the client ruled that administrators must never delete an account, only
+    archive it; it was built, verified and released the same day (Section 10). A fifteenth, on
+    15 October, asks the admin dashboard to show how long each participant spent on their
+    evaluations; the data was already there, so it shipped the same evening (Section 11). As in Sprint 4, the rules live in
+    the database rather than only in the browser. A stored anonymous result can be attached to an
+    account only by a signed-in, verified user, only once, only within 24 hours of completing it,
+    and under the same two-attempts-per-year rule as a normal submission. A statement's wording
+    can be changed only by an administrator, and only the wording: category, order and weighting
+    are locked by a trigger so the scoring model cannot drift.
+  </p>
+
+  <div class="ticks">
+    <div><span class="t">✓</span><span><b>R1</b> Anonymous start, result saved to an account — live 12 October</span></div>
+    <div><span class="t">✓</span><span><b>R2</b> Email verification code — live, delivery proven 13 October</span></div>
+    <div><span class="t">✓</span><span><b>Question bank</b> — live 12 October</span></div>
+    <div><span class="t">✓</span><span><b>Forgot password</b> — live 13 October</span></div>
+    <div><span class="t">✓</span><span><b>Archive instead of delete</b> — live 14 October</span></div>
+    <div><span class="t">✓</span><span><b>Time on task</b> — live 15 October</span></div>
+    <div><span class="t">✓</span><span><b>Stress-tested</b> — 113 database checks, hostile live requests, phone walk-through</span></div>
+  </div>
+  <p>Nine of the twelve criteria are verified by our automated database checks, browser checks,
+    read-only probes of the live system, and a live registration that received its verification
+    code once the project sender was configured on 13 October (Figure 5). The remaining three need
+    a claim and an administrator save on the live site. They are assigned to the tester's live run
+    (<code>SPRINT5_TEST_PLAN.md</code> sections A and B, <code>QUESTION_BANK_TEST_PLAN.md</code> section B)
+    and are marked that way in Section 14.</p>
+
+  <table class="data">
+    <thead>
+      <tr><th style="width:28%">Requirement area</th><th>Outcome</th><th class="nw" style="width:14%">Status</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="k">R1 · Anonymous start, saved result</td>
+          <td>An anonymous participant completes the evaluation as before; the results page offers "Save these results to an account". Creating an account or signing in, without leaving the page, attaches the stored result to the account for the dashboard.</td>
+          <td><span class="pill done">Delivered</span></td></tr>
+      <tr><td class="k">R2 · Email verification code</td>
+          <td>Registration sends a 6-digit code to the given address; the account is usable only after the code is entered. Codes can be resent; signing in with an unverified address returns to the code screen. Codes are sent from <code>noreply@crmpilot.com.au</code> through a verified domain (configured 13 October) and verified arriving in a live test.</td>
+          <td><span class="pill done">Delivered</span></td></tr>
+      <tr><td class="k">Question bank (added in sprint)</td>
+          <td>Administrators see the twenty statements in the admin dashboard and edit their wording. Only wording changes; every edit is stamped; participants read the current wording with the shipped copy as fallback.</td>
+          <td><span class="pill done">Delivered</span></td></tr>
+      <tr><td class="k">Forgot password (added 13 October)</td>
+          <td>"Forgot password?" on the sign-in panel emails a 6-digit reset code; the participant enters it with a new password and is signed in. Built and browser-verified on pull request 5, the reset-code email template set in the dashboard, merged and deployed to production on 13 October (version 2.4).</td>
+          <td><span class="pill done">Delivered</span></td></tr>
+      <tr><td class="k">Archive instead of delete (added 14 October)</td>
+          <td>Administrators can no longer delete a participant. Archive hides a participant from the dashboard, charts and export; Restore brings them back; nothing is removed. The migration also removes the administrator delete policies, so deletion is not an administrator action anywhere. Built and verified, the migration applied, merged and deployed to production on 14 October (version 2.5).</td>
+          <td><span class="pill done">Delivered</span></td></tr>
+      <tr><td class="k">Time on task (added 15 October)</td>
+          <td>The admin dashboard shows how long each participant spent: a Time column per participant, a Time on task card with the average and median per completed evaluation, "Took m:ss" on each session in the profile, and two CSV columns. No database change: every stored evaluation already records when its 10-minute session began and when it was submitted.</td>
+          <td><span class="pill done">Delivered</span></td></tr>
+      <tr><td class="k">Handover items from Sprint 4</td>
+          <td>Keep-alive, backups, credential rotation, ownership transfer and the handover guide are planned for the handover to the university (Section 16). The email sender for verification codes was configured on 13 October.</td>
+          <td><span class="pill plan">Handover</span></td></tr>
+    </tbody>
+  </table>
+
+  <table class="data compact">
+    <thead><tr><th>Measure</th><th>Value</th><th>Measure</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td>Acceptance criteria</td><td class="k">15 · 12 verified, 3 at tester live run</td><td>Pull requests merged</td><td class="k">6</td></tr>
+      <tr><td>Files changed</td><td class="k">28</td><td>Lines added / removed</td><td class="k">1,695 / 379</td></tr>
+      <tr><td>Automated database checks</td><td class="k">113, all passing (73 migration, 40 stress)</td><td>Database migrations applied live</td><td class="k">3</td></tr>
+      <tr><td>Production deployments</td><td class="k">5 (12–14 Oct 2026)</td><td>New database objects</td><td class="k">1 function · 1 trigger · 1 policy · 1 constraint</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============================ 02 OBJECTIVES ============================ -->
+<section class="keep">
+  <h2><span class="n">02</span>Sprint objectives</h2>
+  <p class="sub">As confirmed by the client for Sprint 5, plus the request received during the sprint.</p>
+
+  <table class="data">
+    <thead><tr><th style="width:8%">Ref</th><th>Requirement as stated</th></tr></thead>
+    <tbody>
+      <tr><td class="k">R1</td><td>Anonymous user registration and result saving. The user starts the evaluation anonymously. At the end, the system offers to create an account; the completed result is saved to that account and can be viewed later.</td></tr>
+      <tr><td class="k">R2</td><td>Email verification code. When a user registers, a verification code is sent to the email address given; the account is verified by entering that code.</td></tr>
+      <tr><td class="k">QB</td><td>Question bank: see all questions in the admin panel and edit them.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <span class="lbl">Interpretation agreed during the sprint</span>
+    <p>We read R1 as "the result that was stored anonymously becomes the account's result", not
+    "the participant retakes the evaluation after registering". That keeps the scores the
+    participant has just seen on screen, and it means the offer belongs on the results page,
+    after submission, rather than at sign-up. R2 already existed as the registration step (a
+    6-digit code rather than a link). We kept it, re-verified it, and extended it so it also works
+    when someone registers from the results page. For the question bank we read "edit them" as
+    editing the wording only. The category, order and weighting of a statement are part of
+    Firmin's instrument and of the scoring model, so they stay locked (Section 08).</p>
+  </div>
+</section>
+
+<!-- ============================ 03 PROCESS ============================ -->
+<section>
+  <h2><span class="n">03</span>Sprint process</h2>
+  <p class="sub">How the sprint was planned, tracked and closed.</p>
+
+  <p>The client's two confirmed requirements set the sprint goal. The question bank was added when
+    Dr Firmin asked for it on 12 October, and we delivered it the same day because it reused the
+    admin dashboard and the database patterns we already had. A story closed only when its
+    acceptance criterion in Section 14 had evidence: an automated database check, a browser
+    check, or a read-only probe of the live system. We worked on feature branches and merged
+    through pull requests. Database changes were applied in the Supabase SQL editor after the
+    front-end release that tolerates their absence was live.</p>
+
+  <div class="callout">
+    <span class="lbl">Sprint goal</span>
+    <p>Let a participant start with nothing to lose, with no account and nothing stored until they
+    submit, and once they have seen their result let them keep it with one verified step. And let
+    the client own the instrument's wording without being able to break its scoring.</p>
+  </div>
+
+  <h3>Sprint backlog</h3>
+  <table class="data compact breakable">
+    <thead><tr><th style="width:6%">#</th><th>Story</th><th style="width:15%">Origin</th><th style="width:12%">Status</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="k">S1</td><td>As an anonymous participant, I want to be offered an account after I have seen my result, so that I can keep it without having retaken the evaluation.</td><td>R1</td><td><span class="pill done">Done</span></td></tr>
+      <tr><td class="k">S2</td><td>As a participant who already has an account, I want to sign in from the results page and have this result saved to that account.</td><td>R1</td><td><span class="pill done">Done</span></td></tr>
+      <tr><td class="k">S3</td><td>As a participant, I want my saved result to appear on my dashboard as my active result, with the two-attempts-per-year rule applied as for any submission.</td><td>R1</td><td><span class="pill done">Done</span></td></tr>
+      <tr><td class="k">S4</td><td>As the client, I want a stored anonymous result to be claimable only by the browser that submitted it, only once, and only for a limited time.</td><td>R1 · security</td><td><span class="pill done">Done</span></td></tr>
+      <tr><td class="k">S5</td><td>As a new user, I want a 6-digit code emailed to me and my account verified by entering it — including when I register from the results page.</td><td>R2</td><td><span class="pill done">Done</span></td></tr>
+      <tr><td class="k">S6</td><td>As a participant, I want to resend the code, and to be returned to the code screen if I try to sign in before verifying.</td><td>R2</td><td><span class="pill done">Done</span></td></tr>
+      <tr><td class="k">S7</td><td>As an administrator, I want to see all twenty statements in the admin dashboard and edit their wording.</td><td>QB</td><td><span class="pill done">Done</span></td></tr>
+      <tr><td class="k">S8</td><td>As the client, I want only the wording to be editable, every edit stamped, and recorded answers unaffected, so that the instrument's scoring stays valid.</td><td>QB</td><td><span class="pill done">Done</span></td></tr>
+      <tr><td class="k">S9</td><td>As a participant, I want to read the current wording on the home page, in the questionnaire and in the admin responses view, with the shipped wording if the database cannot be reached.</td><td>QB</td><td><span class="pill done">Done</span></td></tr>
+      <tr><td class="k">S10</td><td>As the client, I want the home page team section to match the sprint documents, so that the platform names the people accountable for it.</td><td>Carried over</td><td><span class="pill done">Done</span></td></tr>
+      <tr><td class="k">S11</td><td>As a new user, I want the verification code to reach any email address, so that registration does not depend on who I am.</td><td>R2</td><td><span class="pill done">Done</span></td></tr>
+      <tr><td class="k">S12</td><td>As the tester, I want a scripted live run with a real account and a real administrator, so that the criteria the team cannot verify itself are closed with evidence.</td><td>Testing</td><td><span class="pill plan">Scheduled</span></td></tr>
+      <tr><td class="k">S13</td><td>As the client, I want the platform to run without the student team — its own sender, keys, monitoring, backups and a written guide — so that it survives handover.</td><td>Carried over</td><td><span class="pill plan">Handover</span></td></tr>
+      <tr><td class="k">S14</td><td>As a participant who has forgotten my password, I want a code emailed to me so that I can choose a new password and get back to my dashboard.</td><td>Added 13 Oct</td><td><span class="pill done">Done</span></td></tr>
+      <tr><td class="k">S15</td><td>As the client, I want administrators to archive a participant rather than delete one, so that no evaluation data can be lost from the dashboard.</td><td>Added 14 Oct</td><td><span class="pill done">Done</span></td></tr>
+      <tr><td class="k">S16</td><td>As an administrator, I want to see how long each participant spent on their evaluations, so that I can judge engagement and whether ten minutes is the right limit.</td><td>Added 15 Oct</td><td><span class="pill done">Done</span></td></tr>
+    </tbody>
+  </table>
+
+  <h3>Definition of Done applied this sprint</h3>
+  <ul>
+    <li>We enforce every rule in the database wherever one exists, not only in the browser.</li>
+    <li>Our automated database checks pass on the full schema chain, and again when the migration is applied twice.</li>
+    <li>The front end copes with a migration that has not been applied yet, so the page can ship first and say what is missing.</li>
+    <li>We verify behaviour in the browser and confirm the change on the live site with read-only requests.</li>
+    <li>We write a tester script for anything we cannot verify ourselves, such as a real inbox or a real administrator.</li>
+    <li>We document the change here with evidence against its acceptance criterion.</li>
+  </ul>
+</section>
+
+<!-- ============================ 04 USER STORIES ============================ -->
+<section>
+  <h2><span class="n">04</span>User stories</h2>
+  <p class="sub">The sprint backlog as stories, each with its acceptance criteria, priority and the team's relative estimate.</p>
+
+  <p>We wrote the stories from the client's wording at planning (R1, R2), from the mid-sprint
+    request (question bank) and from our own observation after the review build (forgot
+    password). Priority uses MoSCoW and the estimate is our relative sizing in story points. A
+    story is Done only when every acceptance criterion has evidence (Section 14). Criteria that
+    need a real inbox or a real administrator on the live site are closed by the tester's live
+    run (S12).</p>
+
+  <table class="data compact breakable">
+    <thead><tr><th style="width:5%">ID</th><th style="width:31%">Story</th><th>Acceptance criteria</th><th style="width:8%">Priority</th><th style="width:6%">Points</th><th style="width:9%">Status</th></tr></thead>
+    <tbody>
+      <tr><td class="k">S1</td><td>As an anonymous participant, I want to be offered an account after I have seen my result, so that I can keep it without retaking the evaluation.</td><td><ul><li>Card appears on the results page only for an anonymous result that reached the server.</li><li>Opens the sign-in modal in save mode; no Anonymous tab; buttons say "Create account &amp; save".</li><li>Closing the modal leaves the participant anonymous and the card unchanged.</li></ul></td><td>Must</td><td>5</td><td><span class="pill done">Done</span></td></tr>
+      <tr><td class="k">S2</td><td>As a participant who already has an account, I want to sign in from the results page and have this result saved to that account.</td><td><ul><li>"I already have an account" opens the Sign in tab in save mode.</li><li>After sign-in the card reports "Saved to your account" with a dashboard link.</li><li>Scores on screen are unchanged throughout.</li></ul></td><td>Must</td><td>3</td><td><span class="pill done">Done</span></td></tr>
+      <tr><td class="k">S3</td><td>As a participant, I want my saved result to appear on my dashboard as my active result, with the two-attempts-per-year rule applied as for any submission.</td><td><ul><li>Claimed result becomes the active result for the year.</li><li>Newest earlier attempt that year is kept as the previous attempt; older ones removed.</li><li>Card says when an earlier attempt was kept.</li></ul></td><td>Must</td><td>3</td><td><span class="pill done">Done</span></td></tr>
+      <tr><td class="k">S4</td><td>As the client, I want a stored anonymous result to be claimable only by the browser that submitted it, only once, and only for a limited time.</td><td><ul><li>Anonymous role cannot execute the claim function.</li><li>Second claim of the same result is refused; another user's result is refused.</li><li>Results older than 24 hours are refused.</li></ul></td><td>Must</td><td>5</td><td><span class="pill done">Done</span></td></tr>
+      <tr><td class="k">S5</td><td>As a new user, I want a 6-digit code emailed to me and my account verified by entering it, including when I register from the results page.</td><td><ul><li>Registration creates an unconfirmed account and shows the code panel.</li><li>Correct code signs in; wrong or expired code is refused.</li><li>In save mode the button reads "Verify &amp; save results" and the result is attached.</li></ul></td><td>Must</td><td>3</td><td><span class="pill done">Done</span></td></tr>
+      <tr><td class="k">S6</td><td>As a participant, I want to resend the code, and to be returned to the code screen if I try to sign in before verifying.</td><td><ul><li>"Resend code" sends a fresh code; only the newest works.</li><li>Sign-in with an unverified address reopens the code panel and requests a new code.</li><li>A refresh during verification restores the panel.</li></ul></td><td>Should</td><td>2</td><td><span class="pill done">Done</span></td></tr>
+      <tr><td class="k">S7</td><td>As an administrator, I want to see all twenty statements in the admin dashboard and edit their wording.</td><td><ul><li>Panel lists 20 rows with number, category, text, last edited.</li><li>Save (or Ctrl/⌘+Enter) stores the wording; "Restore original" returns the shipped text.</li><li>Wording under 10 or over 400 characters is refused.</li></ul></td><td>Must</td><td>5</td><td><span class="pill done">Done</span></td></tr>
+      <tr><td class="k">S8</td><td>As the client, I want only the wording to be editable, every edit stamped, and recorded answers unaffected, so that the instrument's scoring stays valid.</td><td><ul><li>Only administrator accounts can update; others affect zero rows.</li><li>Category, order, weight, code and active flag cannot change (trigger).</li><li>Each edit records time and editor; stored responses keep their values.</li></ul></td><td>Must</td><td>3</td><td><span class="pill done">Done</span></td></tr>
+      <tr><td class="k">S9</td><td>As a participant, I want to read the current wording on the home page, in the questionnaire and in the admin responses view, with the shipped wording if the database cannot be reached.</td><td><ul><li>Pages read database wording first, within a 2.5-second cap.</li><li>Shipped wording is used offline; the evaluation still works.</li></ul></td><td>Should</td><td>3</td><td><span class="pill done">Done</span></td></tr>
+      <tr><td class="k">S10</td><td>As the client, I want the home page team section to match the sprint documents, so that the platform names the people accountable for it.</td><td><ul><li>Home page lists Product Owner Albin Roy and Tester Merajun Nabi.</li></ul></td><td>Could</td><td>1</td><td><span class="pill done">Done</span></td></tr>
+      <tr><td class="k">S11</td><td>As a new user, I want the verification code to reach any email address, so that registration does not depend on who I am.</td><td><ul><li>Codes are sent through custom SMTP from a verified domain, not the built-in mailer.</li><li>A registration on the live site receives its code within a minute (Figure 5).</li></ul></td><td>Must</td><td>3</td><td><span class="pill done">Done</span></td></tr>
+      <tr><td class="k">S12</td><td>As the tester, I want a scripted live run with a real account and a real administrator, so that the criteria the team cannot verify itself are closed with evidence.</td><td><ul><li>Claim on the live site appears on the dashboard (test plan A9–A10).</li><li>Sign-in from the results page saves the result (B1–B4).</li><li>One real administrator edit reaches the home page (question bank B4–C2).</li><li>One real password reset end to end (forgot password A1–A7).</li></ul></td><td>Must</td><td>3</td><td><span class="pill plan">Scheduled</span></td></tr>
+      <tr><td class="k">S13</td><td>As the client, I want the platform to run without the student team — its own sender, keys, monitoring, backups and a written guide — so that it survives handover.</td><td><ul><li>Results-email function deployed with the project sender.</li><li>Credentials rotated; repository and project under university accounts.</li><li>Daily keep-alive and scheduled export in place; handover guide written.</li></ul></td><td>Must</td><td>8</td><td><span class="pill plan">Handover</span></td></tr>
+      <tr><td class="k">S14</td><td>As a participant who has forgotten my password, I want a code emailed to me so that I can choose a new password and get back to my dashboard.</td><td><ul><li>"Forgot password?" on the sign-in panel; request answered the same for unknown addresses.</li><li>Correct code plus a new password signs the participant in; wrong code refused.</li><li>From the results page, the result is saved to the account as well.</li></ul></td><td>Should</td><td>5</td><td><span class="pill done">Done</span></td></tr>
+      <tr><td class="k">S15</td><td>As the client, I want administrators to archive a participant rather than delete one, so that no evaluation data can be lost from the dashboard.</td><td><ul><li>No Delete control anywhere in the admin dashboard; the administrator delete policies are removed from the database.</li><li>Archive hides the participant from the table, stats, charts and CSV; Show archived reveals them; Restore reverses it.</li><li>Only administrators can archive or restore; a participant cannot change their own archive state; administrator accounts cannot be archived.</li></ul></td><td>Must</td><td>5</td><td><span class="pill done">Done</span></td></tr>
+      <tr><td class="k">S16</td><td>As an administrator, I want to see how long each participant spent on their evaluations, so that I can judge engagement and whether ten minutes is the right limit.</td><td><ul><li>Time column per participant (total across completed evaluations, sortable, latest attempt on hover).</li><li>Time on task card: average and median per completed evaluation; archived participants excluded.</li><li>"Took m:ss" per session in the profile; CSV carries time and count; durations capped at the 11-minute server limit.</li></ul></td><td>Should</td><td>3</td><td><span class="pill done">Done</span></td></tr>
+    </tbody>
+  </table>
+
+  <table class="data compact">
+    <thead><tr><th>Measure</th><th>Value</th><th>Measure</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td>Stories in the sprint</td><td class="k">16</td><td>Story points committed</td><td class="k">60</td></tr>
+      <tr><td>Stories done</td><td class="k">14</td><td>Story points done</td><td class="k">49</td></tr>
+      <tr><td>Must / Should / Could</td><td class="k">10 / 5 / 1</td><td>Handover</td><td class="k">S12 (3), S13 (8)</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============================ 05 R1 ============================ -->
+<section>
+  <h2><span class="n">05</span>Anonymous start, saved result — R1</h2>
+
+  <p>Nothing changes for the anonymous participant until the result is on screen. They begin
+    without an account, nothing is stored while they answer (Sprint 4, R6), and one call to
+    <code>submit_assessment()</code> stores the completed evaluation with no user attached. The
+    completion screen now tells them where the result can be kept: "Your results are saved
+    anonymously — on the results page you can save them to an account."
+  </p>
+
+  <figure class="narrow">
+    <img src="PEP_Sprint5_Report_assets/fig-save-card.png" alt="">
+    <figcaption><b>Figure 1.</b> Results page for an anonymous participant whose result reached the server: the "Save these results to an account" card with the two ways in. Rendered from the Sprint 5 build with sample answers.</figcaption>
+  </figure>
+
+  <h3>The offer</h3>
+  <table class="data compact">
+    <thead><tr><th style="width:26%">Condition</th><th>Behaviour</th></tr></thead>
+    <tbody>
+      <tr><td class="k">When the card appears</td><td>Only when the participant is anonymous <em>and</em> the browser holds the session id that <code>submit_assessment()</code> returned — that is, the result exists on the server. A result that was saved on the device only (server unreachable) shows no card, because there is nothing to attach.</td></tr>
+      <tr><td class="k">Create account &amp; save</td><td>Opens the sign-in modal in <em>claim</em> mode on the Create account tab: title "Save your results", no Anonymous tab, button "Create account &amp; save". Registration proceeds to the verification code (Section 07).</td></tr>
+      <tr><td class="k">I already have an account</td><td>Same modal on the Sign in tab; button "Sign in &amp; save results".</td></tr>
+      <tr><td class="k">Closing the modal</td><td>Escape, the × button or the backdrop close it; the participant stays anonymous and the card is unchanged.</td></tr>
+      <tr><td class="k">Refresh during verification</td><td>The pending verification is kept for the tab, so the code panel reopens — still in claim mode — and entering the code still saves the result.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="fig-row two" style="align-items:start">
+    <figure style="margin-top:0">
+      <img src="PEP_Sprint5_Report_assets/fig-claim-register.png" alt="">
+      <figcaption><b>Figure 2.</b> "Save your results": the modal in claim mode, Create account tab. The Anonymous tab is hidden and the button says what will happen.</figcaption>
+    </figure>
+    <figure style="margin-top:0">
+      <img src="PEP_Sprint5_Report_assets/fig-claim-verify.png" alt="">
+      <figcaption><b>Figure 3.</b> The verification step in claim mode: the 6-digit code panel with "Verify &amp; save results". Sample address.</figcaption>
+    </figure>
+  </div>
+
+  <h3>After sign-in or verification</h3>
+  <p>The participant becomes the signed-in identity without the device clearing the result on
+    screen (Section 12), and the page calls <code>claim_assessment()</code> with the session id. While
+    it runs the card says "Saving this result to your account…". On success it shows "Saved to
+    your account" with a link to the dashboard, and the anonymous email-capture card disappears
+    because the account's address now receives results. If the participant already had an
+    attempt this year, the card says so: the earlier attempt is kept as their previous attempt,
+    exactly as after a normal second submission. If the attachment fails the card says why
+    (Section 06) and still offers the dashboard. The account itself is fine, and their next
+    evaluation will be saved to it automatically.
+  </p>
+
+  <div class="stack">
+    <figure style="margin:0">
+      <img src="PEP_Sprint5_Report_assets/fig-claim-saved.png" alt="">
+    </figure>
+    <figure style="margin:0">
+      <img src="PEP_Sprint5_Report_assets/fig-claim-saved-prev.png" alt="">
+      <figcaption><b>Figure 4.</b> The card after a successful save: first attempt this year (top) and with an earlier attempt kept as the previous attempt (bottom). The scores above are unchanged. Captured locally with the database call simulated, so no live account was created.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ============================ 05 CLAIM RULES ============================ -->
+<section>
+  <h2><span class="n">06</span>Claim rules in the database</h2>
+
+  <p>The attachment is one database function, <code>claim_assessment(p_session_id)</code> in
+    <code>sprint5-claim.sql</code>. It runs with the caller's identity from the authentication token,
+    so the browser cannot say who it is. We kept the random session id as the only credential. It
+    is a version-4 UUID that <code>submit_assessment()</code> returns to the browser that submitted,
+    nothing lets another caller list or guess unclaimed sessions (row-level security: users read
+    their own rows, administrators read all), and a result can be claimed once.
+  </p>
+
+  <table class="data compact">
+    <thead><tr><th style="width:30%">Rule</th><th>Enforcement</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Only a signed-in, verified account</td><td>The anonymous web role has no execute grant; inside the function an anonymous-token caller is also refused ("Sign in to save results to your account").</td></tr>
+      <tr><td class="k">Only a stored, completed, still-anonymous result</td><td>The session must exist, have <code>completed_at</code> set and <code>user_id</code> null; otherwise <code>CLAIM_UNAVAILABLE</code>. The row is locked for the duration so two claims cannot race.</td></tr>
+      <tr><td class="k">Within 24 hours of completing</td><td>Older results answer <code>CLAIM_EXPIRED</code>. Long enough to decide after seeing the result; short enough that a session id left on a shared device does not stay claimable.</td></tr>
+      <tr><td class="k">Attach</td><td><code>user_id</code> is set to the caller and <code>participant_email</code> to the account's address (an anonymous email entered earlier is kept only if the account has none).</td></tr>
+      <tr><td class="k">Two attempts per year</td><td>The claimed result becomes the active result; the newest earlier attempt in the same calendar year (Australia/Melbourne) is kept as the previous attempt; anything older that year is removed — the same trim as on submission.</td></tr>
+      <tr><td class="k">Return value</td><td><code>{ session_id, year, previous_id, removed }</code>, which the page uses to say whether a previous attempt was kept.</td></tr>
+    </tbody>
+  </table>
+
+<pre>claim_assessment(p_session_id uuid) returns jsonb — security definer
+
+ 1  caller must be signed in and not an anonymous-token user          → 42501
+ 2  session must be completed and have no user yet (row locked)       → CLAIM_UNAVAILABLE
+ 3  completed less than 24 hours ago                                  → CLAIM_EXPIRED
+ 4  set user_id = caller, participant_email = account address
+ 5  keep the claimed result + the newest earlier same-year attempt; delete older same-year attempts
+ 6  return { session_id, year, previous_id, removed }</pre>
+
+  <div class="callout">
+    <span class="lbl">Why the browser keeps the id only for the tab</span>
+    <p>The session id is held in the tab's session storage, not in persistent storage. So the offer
+    lives as long as the results tab on that device, and on the server for 24 hours. A
+    participant who closes the tab before deciding cannot claim later. We chose that over leaving
+    a claimable id behind on shared or public computers.</p>
+  </div>
+</section>
+
+<!-- ============================ 06 R2 ============================ -->
+<section>
+  <h2><span class="n">07</span>Email verification code — R2</h2>
+
+  <p>Creating an account sends a 6-digit code to the address given, and the account is usable only
+    once that code has been entered. We use Supabase Auth's sign-up confirmation with the
+    "Confirm signup" template set to emit the token rather than a link, using the branded template
+    <code>supabase/templates/confirm-signup.html</code>. We read the live authentication settings on
+    13 October 2026: email confirmation is required and anonymous sign-ins are enabled. The same
+    day we switched the authentication mailer from Supabase's built-in service, which only
+    delivers to members of the project's own organisation, to custom SMTP through Resend. It
+    sends as <code>noreply@crmpilot.com.au</code> on a domain whose DKIM and SPF records were already
+    verified.
+  </p>
+
+  <table class="data compact">
+    <thead><tr><th style="width:28%">Stage</th><th>Behaviour</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Register</td><td>Full name, email, password (6+ characters, strength shown) and consent. On submit the account is created unconfirmed and the modal switches to "Verify your email", showing the address.</td></tr>
+      <tr><td class="k">Code entry</td><td>Digits only, six required before the button enables. A wrong code says "Incorrect code… if you clicked Resend, only the newest code works"; an expired code says to resend. Codes expire after one hour.</td></tr>
+      <tr><td class="k">Resend</td><td>"Resend code" requests a fresh code; a toast confirms it. Only the newest code is accepted.</td></tr>
+      <tr><td class="k">Sign in before verifying</td><td>Sign-in is refused by the service; the page returns the participant to the code panel and requests a new code automatically.</td></tr>
+      <tr><td class="k">Existing address</td><td>Registering with an address that already has a confirmed account is refused with "An account with this email already exists" — including the case where the service answers with a placeholder user to avoid revealing registered addresses; no code is sent.</td></tr>
+      <tr><td class="k">On success</td><td>The profile row is created, the participant is signed in, and either moves to the questionnaire (home page) or stays on the results page while the result is saved (claim mode).</td></tr>
+      <tr><td class="k">Refresh mid-flow</td><td>The pending address and intent are kept for the tab (one hour), so the code panel reopens after a refresh.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="fig-row two" style="grid-template-columns:1fr 1.07fr; align-items:start">
+    <div><div class="cap">Live site · registration</div><img src="PEP_Sprint5_Report_assets/fig-live-verify.png" alt=""></div>
+    <div><div class="cap">Inbox · the code, from noreply@crmpilot.com.au</div><img src="PEP_Sprint5_Report_assets/fig-live-code-email.png" alt=""></div>
+  </div>
+  <figure style="margin-top:1mm"><figcaption><b>Figure 5.</b> <span class="live">LIVE</span> 13 October 2026: an account registered on the live site with a Gmail address; the 6-digit code arrived within a minute from the project sender, using the branded template.</figcaption></figure>
+
+  <div class="callout">
+    <span class="lbl">Delivery verified</span>
+    <p>Until the sender was configured we could not see a code arrive in any inbox, and this item
+    had carried over from Sprint 4. With custom SMTP in place, a registration on the live site
+    received its code within a minute (Figure 5). That is the evidence for acceptance criterion
+    8. The results-email function still uses its earlier sender and is listed in Section 16.</p>
+  </div>
+</section>
+
+<!-- ============================ 07 QUESTION BANK ============================ -->
+<section>
+  <h2><span class="n">08</span>Question bank</h2>
+
+  <p>The twenty statements have always lived in the <code>questions</code> table, but the platform read
+    the copy shipped in <code>js/questions.js</code>. The admin dashboard now has a Question bank panel
+    between the demographic summary and the participant sessions. It shows every statement with
+    its number, category, a text box with a character counter, when and by whom it was last
+    edited, a Save button (Ctrl/⌘+Enter also works) and Restore original. Every page that shows a
+    statement reads the database first and falls back to the shipped wording if it cannot be
+    reached. That covers the home page, the questionnaire and review screen, and the admin
+    responses view. The read is capped at 2.5 seconds so a slow connection never holds up the
+    evaluation.
+  </p>
+
+  <figure>
+    <img src="PEP_Sprint5_Report_assets/fig-question-bank.png" alt="">
+    <figcaption><b>Figure 6.</b> The Question bank panel in the admin dashboard, reading the twenty statements from the live database (original wording, nothing edited yet). Administrator gate bypassed locally for the capture; no change saved.</figcaption>
+  </figure>
+
+  <figure>
+    <img src="PEP_Sprint5_Report_assets/fig-question-bank-edit.png" alt="">
+    <figcaption><b>Figure 7.</b> Editing statement 03: the counter updates, Save enables, and Restore original appears. Wording under 10 characters disables Save with a message. Sample edit, not saved.</figcaption>
+  </figure>
+
+  <h3>What can and cannot change</h3>
+  <table class="data compact">
+    <thead><tr><th style="width:30%">Rule</th><th>Enforcement (<code>question-bank.sql</code>)</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Only administrators</td><td>Row-level security policy <code>admins_update_questions</code> for the two administrator addresses; everyone can still read. A non-administrator's update affects zero rows.</td></tr>
+      <tr><td class="k">Only the wording</td><td>Trigger <code>questions_guard_update</code> raises "Only the wording of a question can be edited" if code, category, weight, order or active flag would change — so the scoring model (five statements per category, equal weights) cannot be altered from the dashboard or by a crafted request.</td></tr>
+      <tr><td class="k">A real sentence</td><td>Constraint <code>questions_text_length</code>: trimmed wording between 10 and 400 characters.</td></tr>
+      <tr><td class="k">Audit</td><td>The trigger stamps <code>updated_at</code> and <code>updated_by</code> (the administrator's email) on every edit; the panel shows them and counts edited statements.</td></tr>
+      <tr><td class="k">Past data unchanged</td><td>Responses store the answer value and the statement code; an edit changes what future participants read, not stored answers.</td></tr>
+      <tr><td class="k">Safe to ship first</td><td>Until the migration is applied the panel is read-only and says so; the page never depends on the columns existing.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <span class="lbl">Research consideration</span>
+    <p>A reworded statement changes what later answers mean. The platform records who changed what
+    and when, so a change can be reported. Whether an edit keeps a statement equivalent to
+    Firmin's original is a research judgement for the client, not something the software can
+    enforce.</p>
+  </div>
+</section>
+
+<!-- ============================ 08 FORGOT PASSWORD ============================ -->
+<section>
+  <h2><span class="n">09</span>Forgot password — added and released 13 October</h2>
+  <p class="sub">Not in the client's Sprint 5 list. We added it after the review build when we noticed the sign-in panel had no way to recover an account.</p>
+
+  <p>Until now a participant who forgot their password was locked out of their dashboard and
+    history, with no way back except contacting an administrator. The sign-in panel now has a
+    "Forgot password?" link. It asks for the account's address and emails a 6-digit reset code
+    through the same sender as registration. The participant enters the code and a new password
+    and is signed in. The flow works wherever the sign-in modal opens, including the results page
+    in save-to-account mode, where the final button reads "Set password &amp; save results" and
+    the anonymous result is attached just as it would be after a normal sign-in.
+  </p>
+
+  <div class="fig-row two" style="align-items:start">
+    <figure style="margin-top:0">
+      <img src="PEP_Sprint5_Report_assets/fig-forgot.png" alt="">
+      <figcaption><b>Figure 8.</b> "Reset your password": the address the account was registered with, and one button. Sample address.</figcaption>
+    </figure>
+    <figure style="margin-top:0">
+      <img src="PEP_Sprint5_Report_assets/fig-reset.png" alt="">
+      <figcaption><b>Figure 9.</b> "Choose a new password": the 6-digit code with the new password and its strength meter. Sample values.</figcaption>
+    </figure>
+  </div>
+
+  <table class="data compact">
+    <thead><tr><th style="width:28%">Stage</th><th>Behaviour</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Request</td><td>The address is submitted to the authentication service's recovery endpoint. The response is the same whether or not an account exists, and the next step says "if an account exists for …", so the form cannot be used to discover registered addresses.</td></tr>
+      <tr><td class="k">Code</td><td>Six digits, one hour, only the newest code accepted; "Resend code" requests another. A wrong or stale code is refused with one message, because the service reports both the same way.</td></tr>
+      <tr><td class="k">New password</td><td>At least six characters, with the register panel's strength meter. The code signs the participant in; the password is set on that session; the service refuses a password identical to the old one.</td></tr>
+      <tr><td class="k">After</td><td>The normal post-sign-in path runs: on the home page the participant goes to the questionnaire; on the results page the stored result is saved to the account.</td></tr>
+      <tr><td class="k">Refresh</td><td>The pending reset is kept for the tab for one hour, so a refresh returns to the code step; closing the modal forgets it.</td></tr>
+      <tr><td class="k">Offline</td><td>"Can't reach the sign-in service" under the field, as for sign-in.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <span class="lbl">Status</span>
+    <p>We built it on branch <code>feat/forgot-password</code> (commit <code>2ea485f</code>) as pull request 5,
+    tested it on the preview deployment, merged it (<code>b85315f</code>) and it went live at version
+    2.4 on 13 October. Browser checks with the authentication calls stubbed all passed: the link,
+    step copy, the hidden tab row, submit gating, digit sanitising, the strength meter, the
+    wrong-code message, restore after refresh, the success sequence (recovery code, then
+    password, then sign-in event and identity) and the claim-mode label. The dashboard "Reset
+    password" template was set to emit the code (<code>supabase/templates/reset-password.html</code>)
+    before the merge, so the email carries a 6-digit code from the same sender as registration.
+    The tester's end-to-end run with a real account (<code>FORGOT_PASSWORD_TEST_PLAN.md</code>) is
+    listed with the other live-run items.</p>
+  </div>
+</section>
+
+<!-- ============================ 10 ARCHIVE ============================ -->
+<section>
+  <h2><span class="n">10</span>Archive instead of delete — added and released 14 October</h2>
+  <p class="sub">A rule from the client after the review build: an administrator must never delete an account, only archive it.</p>
+
+  <p>
+    The admin dashboard had a Delete button on every participant row, and a hidden "reset all
+    test data" control, both backed by administrator delete policies in the database. We removed
+    all of it. The row button is now Archive: the participant disappears from the table, the
+    stats, the charts and the CSV export, and nothing is removed. A "Show archived" toggle reveals
+    archived participants greyed out with an Archived badge that records when and by whom, and
+    Restore brings them back. Archived participants can still sign in and use their dashboard;
+    the archive only changes what administrators see.
+  </p>
+
+  <div class="stack">
+    <figure style="margin:0">
+      <img src="PEP_Sprint5_Report_assets/fig-archive.png" alt="">
+    </figure>
+    <figure style="margin:0">
+      <img src="PEP_Sprint5_Report_assets/fig-archive-shown.png" alt="">
+      <figcaption><b>Figure 10.</b> The participant table with Archive in place of Delete (top), and with "Show archived" on: the archived participant is greyed, badged, and can be restored (bottom). Sample participants; rendered locally with the data layer stubbed.</figcaption>
+    </figure>
+  </div>
+
+  <table class="data compact">
+    <thead><tr><th style="width:30%">Rule</th><th>Enforcement (<code>archive-participants.sql</code>)</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Administrators cannot delete</td><td>The three administrator delete policies and the reset-test-data function are dropped. An administrator's delete now affects zero rows under row-level security, whatever client sends it. Participants' own <code>delete_previous_attempt()</code> is unaffected.</td></tr>
+      <tr><td class="k">Only administrators archive or restore</td><td>One function, <code>set_participant_archived()</code>, checks the caller's address; the anonymous role has no execute grant.</td></tr>
+      <tr><td class="k">A participant cannot change their own state</td><td>Participants may update their own profile row, so a trigger refuses any change to the archive columns from a non-administrator.</td></tr>
+      <tr><td class="k">Administrator accounts cannot be archived</td><td>Refused inside the function.</td></tr>
+      <tr><td class="k">Nothing is lost</td><td>Profile, sessions and responses stay; archived data still falls under the three-year purge like everything else.</td></tr>
+      <tr><td class="k">Safe to ship first</td><td>Until the migration is applied the dashboard loads as before, without the Archive button or the toggle.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <span class="lbl">Status</span>
+    <p>Built on branch <code>feat/archive-participants</code> (commit <code>f687899</code>) as pull request 6.
+    The migration passed 20 automated checks in PGlite on the full schema chain, applied over the
+    old delete policies first: archive and restore with stamping, administrator accounts refused,
+    non-administrator and anonymous callers refused, a participant unable to un-archive their own
+    row, the delete policies and reset function gone, and an administrator delete affecting zero
+    rows. Browser checks with the data layer stubbed covered the controls, the stats, the toggle
+    and the restore. The migration was applied to the production database on 14 October and
+    confirmed by read-only probes: the archive function present and refusing the anonymous role,
+    the reset function gone, the archive columns readable. Pull request 6 was merged
+    (<code>1f3805c</code>) and the live dashboard serves version 2.5 with Archive in place of
+    Delete. Figure 11 shows the migration's effect on the database roles.</p>
+  </div>
+
+<pre>set_participant_archived(p_user_id uuid, p_archived boolean) returns jsonb — security definer
+
+ 1  caller's address must be an administrator's        → refused
+ 2  participant must exist                             → not found
+ 3  participant must not be an administrator           → refused
+ 4  set archived_at / archived_by (or clear both)
+ 5  return { user_id, archived, archived_at }
+
+also:  drop policy admins_delete_sessions, admins_delete_responses, admins_delete_users
+       drop function admin_reset_test_data()</pre>
+  <figure style="margin-top:1mm"><figcaption><b>Figure 11.</b> The archive function and the deletions removed by the migration.</figcaption></figure>
+</section>
+
+<!-- ============================ 11 TIME ON TASK ============================ -->
+<section>
+  <h2><span class="n">11</span>Time on task — added and released 15 October</h2>
+  <p class="sub">A request from the client on the eve of the poster session: show on the admin dashboard how much time each user has spent.</p>
+
+  <p>
+    We did not need a new table or a tracker in the browser. Since Sprint 4 every stored
+    evaluation carries the moment its ten-minute session began and the moment it was submitted,
+    because the server uses those two timestamps to refuse late submissions. The time a
+    participant spent is simply their difference. The dashboard now shows it in four places: a
+    Time column in the participant table, totalled across their completed evaluations and
+    sortable, with the count and the latest attempt on hover; a Time on task card under
+    Engagement with the average and the median per completed evaluation; a "Took m:ss" line on
+    each session in the participant profile; and two columns in the CSV export. Archived
+    participants are left out, as they are everywhere else.
+  </p>
+
+  <div class="stack">
+    <figure style="margin:0">
+      <img src="PEP_Sprint5_Report_assets/fig-time-stats.png" alt="">
+    </figure>
+    <figure style="margin:0">
+      <img src="PEP_Sprint5_Report_assets/fig-time-table.png" alt="">
+      <figcaption><b>Figure 12.</b> The Time on task card among the engagement figures (top) and the Time column in the participant table (bottom). Sample participants; rendered locally with the data layer stubbed.</figcaption>
+    </figure>
+  </div>
+
+  <table class="data compact">
+    <thead><tr><th style="width:30%">Rule</th><th>Behaviour</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Source of truth</td><td>Start is the session start the browser reported and the server validated; finish is the server's own clock at submission. Nothing is written while the participant answers, so there is nothing to track in between.</td></tr>
+      <tr><td class="k">Per participant</td><td>The column sums every completed evaluation; a returning participant with two attempts shows the total, and the hover text gives the count and the latest attempt's time.</td></tr>
+      <tr><td class="k">Per evaluation</td><td>The card averages across evaluations, not participants, so a second attempt counts as its own evaluation. The median is shown alongside because a few slow sessions move an average more than they should.</td></tr>
+      <tr><td class="k">Older rows</td><td>Evaluations stored before the session rule could run for hours. They are capped at the eleven-minute limit so they cannot distort the averages, and the cap is visible as "11:00".</td></tr>
+      <tr><td class="k">Unfinished</td><td>A session that was started but never submitted has no time and is not counted.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <span class="lbl">Status</span>
+    <p>Built on branch <code>feat/time-on-task</code> (commit <code>679e4a0</code>) as pull request 7. Browser checks with the data layer stubbed: a participant with two
+    evaluations of 7:42 and 6:28 shows 14:10 with "2 completed evaluations · latest 7:42" on hover;
+    a participant with one 9:01 evaluation and a ninety-minute legacy row shows 20:01, the legacy
+    row capped at 11:00; an unfinished participant shows a dash and sorts last; the card reports an
+    average of 8:33 and a median of 9:01 over four evaluations with an archived participant
+    excluded; the profile lists "Took 7:42" and "Took 6:28"; sorting by the column works in both
+    directions; no console errors. Merged as <code>c6f7772</code> and live at version 2.6 the same evening. Figure 13 shows how the three figures are derived.</p>
+  </div>
+
+<pre>time spent (one evaluation) = completed_at − created_at, capped at 11:00
+time column (participant)   = sum over their completed evaluations
+time on task card           = mean and median over all completed evaluations of active participants</pre>
+  <figure style="margin-top:1mm"><figcaption><b>Figure 13.</b> How the three figures are derived from the two timestamps every evaluation already carries.</figcaption></figure>
+</section>
+
+<!-- ============================ 12 ARCHITECTURE ============================ -->
+<section>
+  <h2><span class="n">12</span>Architecture changes</h2>
+
+  <p>The platform is still a static front end (HTML, CSS and vanilla JavaScript, hosted on Vercel)
+    over Supabase (PostgreSQL, authentication, edge functions). In Sprint 5 we changed four parts
+    of the client code so that sign-in can happen on any page and hand control back to that page.
+  </p>
+
+  <table class="data compact">
+    <thead><tr><th style="width:30%">Change</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td class="k">The sign-in modal is rendered by <code>js/auth.js</code></td><td>Its markup lived only in the home page, so no other page could open it. It is now injected by the script, and any page that loads <code>auth.js</code> and <code>css/modal.css</code> can open it. The home page lost 100 lines of duplicated markup (Figure 14).</td></tr>
+      <tr><td class="k">Intents</td><td>The modal is opened with an intent — <em>start</em> (default: go to the questionnaire) or <em>claim</em> (stay here and save the result). The intent sets the title, copy and button labels, hides the Anonymous tab, and survives a refresh during verification.</td></tr>
+      <tr><td class="k">The <code>ped:signed-in</code> event</td><td>After a successful sign-in, registration or verification, <code>auth.js</code> dispatches a cancelable document event carrying the profile and intent. A page that cancels it owns what happens next (the results page saves the result); otherwise <code>auth.js</code> redirects as before. Pages no longer need to know how sign-in works.</td></tr>
+      <tr><td class="k"><code>PED.identity.adopt()</code></td><td><code>begin()</code> clears another participant's answers on shared devices — correct at the start, wrong when the same person is becoming an account holder with a result on screen. <code>adopt()</code> switches identity without touching the result on the device.</td></tr>
+      <tr><td class="k"><code>PED.questionBank</code> (<code>js/question-bank.js</code>)</td><td><code>sync()</code> overlays database wording onto <code>PED.QUESTIONS</code> in place, so modules that already hold a reference see the new text; <code>fetchAll()</code>, <code>update()</code> and <code>defaultText()</code> serve the admin panel. Only <code>text</code> is ever changed on the client.</td></tr>
+    </tbody>
+  </table>
+
+  <figure class="half">
+    <img src="PEP_Sprint5_Report_assets/fig-home-modal.png" alt="">
+    <figcaption style="text-align:center"><b>Figure 14.</b> The home-page modal, unchanged for participants, now rendered by <code>auth.js</code> with its three tabs.</figcaption>
+  </figure>
+
+  <h3>Data model</h3>
+  <table class="data compact">
+    <thead><tr><th style="width:32%">Database object</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td class="k"><code>claim_assessment(uuid)</code></td><td>Attaches a stored anonymous result to the caller's account under the rules in Section 06. <code>SECURITY DEFINER</code>; executable by the signed-in role only.</td></tr>
+      <tr><td class="k"><code>questions.updated_at</code>, <code>questions.updated_by</code></td><td>Audit columns stamped by the trigger on every wording edit.</td></tr>
+      <tr><td class="k"><code>questions_text_length</code></td><td>Check constraint: trimmed wording of 10–400 characters.</td></tr>
+      <tr><td class="k"><code>questions_guard_update()</code> + trigger</td><td>Locks code, category, weight, order and active flag; trims and stamps the edit.</td></tr>
+      <tr><td class="k"><code>admins_update_questions</code></td><td>Row-level security policy allowing the two administrator addresses to update.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Migration safety</h3>
+  <p>Both migrations are idempotent. We tested them on the full schema chain
+    (<code>supabase-setup.sql</code>, <code>admin-policies.sql</code>, <code>sprint3-demographics.sql</code>,
+    <code>sprint4-attempts.sql</code>, <code>sprint5-claim.sql</code>, <code>question-bank.sql</code>) and applied
+    each one twice. Both front-end releases went live before their migration and behave correctly
+    without it: the results card reports "needs the Sprint 5 database update" after sign-in, and
+    the question bank panel is read-only with a notice.
+  </p>
+</section>
+
+<!-- ============================ 09 QA ============================ -->
+<section>
+  <h2><span class="n">13</span>Quality assurance</h2>
+  <p class="sub">Defects and process issues found during development and release, all resolved before or on the day of release.</p>
+
+  <div class="defect">
+    <h4>1 &nbsp;Becoming an account holder would have wiped the result from the device</h4>
+    <div class="meta">Severity: high · Area: identity · Found in build, before release</div>
+    <p>The existing <code>PED.identity.begin()</code> clears the previous participant's answers, scores and
+    session id whenever the identity changes. That is right on a shared device and exactly wrong
+    for a participant creating an account to keep the result on screen: the first claim would
+    have deleted the session id it needed. We added <code>adopt()</code>, which switches identity
+    without touching the result, and <code>begin()</code> now calls it after its clearing step so the
+    two cannot drift apart.</p>
+  </div>
+  <div class="defect">
+    <h4>2 &nbsp;The sign-in modal could only be opened from the home page</h4>
+    <div class="meta">Severity: medium · Area: front-end structure</div>
+    <p>The modal markup was part of <code>index.html</code>, so the results page had no way to show it. We
+    moved it into <code>auth.js</code> as a single source, with the intent mechanism described in
+    Section 12, and checked that the home page modal is unchanged (three tabs, close by ×,
+    backdrop and Escape).</p>
+  </div>
+  <div class="defect">
+    <h4>3 &nbsp;Question bank pull request merged into the wrong branch</h4>
+    <div class="meta">Severity: medium · Area: release process · 12 October</div>
+    <p>The question bank was built on top of the Sprint 5 branch, so its pull request targeted that
+    branch until GitHub retargets it to <code>main</code> when the base is merged. We merged it seven
+    seconds after the Sprint 5 pull request, before the retarget, so it landed on the
+    already-merged feature branch and not on <code>main</code>. We noticed within minutes because the
+    live site still served asset version 2.2 when we expected 2.3, and fixed it with a third pull
+    request from the feature branch to <code>main</code> containing the same fifteen files. The lesson
+    is recorded in Section 17.</p>
+  </div>
+  <div class="defect">
+    <h4>4 &nbsp;Test engine crashed on the migration's error handling</h4>
+    <div class="meta">Severity: low · Area: test tooling</div>
+    <p>PGlite 0.3.x fails on the PL/pgSQL <code>raise</code> statement ("cannot resolve symbol
+    setTempRet0"), which both migrations use for their refusals. We pinned the harness to PGlite
+    0.2.17, on which all 73 checks run.</p>
+  </div>
+  <div class="defect">
+    <h4>5 &nbsp;Completion screen gave anonymous participants no hint about keeping the result</h4>
+    <div class="meta">Severity: low · Area: copy</div>
+    <p>The status line now reads "Your results are saved anonymously — on the results page you can
+    save them to an account", so the offer on the next page is expected rather than a surprise.</p>
+  </div>
+  <div class="defect">
+    <h4>6 &nbsp;Home-page team roster out of date</h4>
+    <div class="meta">Severity: low · Area: content · Carried from Sprint 4</div>
+    <p>The team section still named a member who had left. We corrected it (Product Owner Albin Roy,
+    Tester Merajun Nabi) and released it on 12 October.</p>
+  </div>
+</section>
+
+<!-- ============================ 10 TESTING ============================ -->
+<section>
+  <h2><span class="n">14</span>Testing and acceptance</h2>
+
+  <h3>Database — 73 automated checks</h3>
+  <p>We ran all three migrations in PGlite (PostgreSQL compiled to WebAssembly) against the full schema
+    chain, with mocked authentication for anonymous, signed-in, anonymous-token and administrator
+    callers. All checks passed.
+  </p>
+  <table class="data compact">
+    <thead><tr><th style="width:30%">Migration</th><th>Checks</th><th style="width:10%">Count</th></tr></thead>
+    <tbody>
+      <tr><td class="k"><code>sprint5-claim.sql</code></td><td>Claim by the submitting account succeeds and sets user and email; a second claim of the same result is refused; claims by an anonymous-token caller, without a user, of another user's result, of an in-progress session and of a non-existent session are refused; results older than 24 hours are refused; the two-per-year trim keeps the newest earlier attempt and removes older ones; return value; execute grant denied to the anonymous role; migration applied twice.</td><td class="k">32</td></tr>
+      <tr><td class="k"><code>question-bank.sql</code></td><td>Audit columns added; wording shorter than 10, blank, and longer than 400 characters refused; each of code, category, weight, order and active flag locked; wording trimmed; <code>updated_at</code>/<code>updated_by</code> stamped with the editor; administrator update allowed and non-administrator update affects no rows under row-level security; select still open to all; migration applied twice.</td><td class="k">21</td></tr>
+      <tr><td class="k"><code>archive-participants.sql</code></td><td>Applied over the old delete policies: archive and restore with stamping; administrator account refused; unknown id; non-administrator and anonymous callers refused; a participant cannot un-archive their own row but can still edit their profile; anon has no execute grant; delete policies and reset function gone; an administrator delete of a session or a user affects no rows; participants' own deletion unaffected; no rows lost; migration applied twice.</td><td class="k">20</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Browser — end to end</h3>
+  <ul>
+    <li>Results page: card shown only with a server session id and an anonymous identity; hidden when signed in; hidden when the result was saved on the device only.</li>
+    <li>Claim modal: title, copy and buttons in claim mode on both tabs; Anonymous tab hidden; Escape, × and backdrop close and reset the intent; verification panel restored after a refresh in claim mode.</li>
+    <li>Saved states: first attempt, earlier attempt kept, and the failure message with the dashboard link, with the scores on screen unchanged throughout.</li>
+    <li>Home page: modal rendered by <code>auth.js</code> unchanged — three tabs, validation, close behaviours; assets load at the current version with no console errors on every page.</li>
+    <li>Question bank: twenty rows with category pills; counter, Save enabling, under-length message, Restore original; read-only state with the notice when the audit columns are absent; database wording overlaid on the home page and questionnaire.</li>
+  </ul>
+
+  <h3>Stress test — 14 October</h3>
+  <p>
+    After the last release we tried to break it. Three angles: hostile and bulk data against
+    the database rules, hostile requests against the live service, and the whole participant
+    journey on a phone-sized screen.
+  </p>
+  <table class="data compact breakable">
+    <thead><tr><th style="width:22%">Angle</th><th>What we threw at it</th><th style="width:26%">Result</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Database, 40 checks</td><td>300 participants; 200 signed-in and 100 anonymous submissions; 19 answers, an extra key, answers 0 and 6, a string, a null, an empty object and an array; a start 12 minutes old, 10.5 minutes old and in the future; claims with a random id, another participant's result, an anonymous token, the same result twice by two users, a third same-year claim, and a claim after 24 hours; statement wording of exactly 400 and 401 characters, 9 characters, unicode with quotes and HTML, an injection-shaped string, a category change by an administrator, 50 rapid edits; 40 archive/restore toggles, 150 participants archived in one go, an archived participant reading their own data and trying to restore themselves; deletes by a participant and by an administrator; a three-year-old session.</td><td>All 40 passed. Every bad input refused before any write; 0.7 ms per submission; 150 archives in 25 ms; one purge removed the old session and nothing else.</td></tr>
+      <tr><td class="k">Live service, 11 requests plus a burst</td><td>From an unsigned client: incomplete, empty, malformed and expired submissions; claims with a random and a non-UUID id; archive, delete-attempt, purge and the removed reset function; direct updates and deletes on the questions, sessions and users tables; then 30 refused claims back to back.</td><td>Every request refused with the intended message; the direct writes affected zero rows and the live wording is unchanged; the burst finished in two seconds with no throttling; pages arrive in about 0.3 s at 2–14 KB.</td></tr>
+      <tr><td class="k">Phone, 375 px</td><td>Home, anonymous start, the welcome screen, all twenty statements answered through the real controls, the review screen; then the results, dashboard, admin and report pages signed out.</td><td>Every screen fits without horizontal scroll; the clock ran from 10:00; nothing was stored and no request left the browser before submission; no console errors (Figure 15).</td></tr>
+    </tbody>
+  </table>
+
+  <figure class="half">
+    <img src="PEP_Sprint5_Report_assets/fig-mobile-review.jpg" alt="">
+    <figcaption style="text-align:center"><b>Figure 15.</b> <span class="live">LIVE</span> The review screen on a 375-pixel viewport after twenty answers, clock running, nothing yet sent.</figcaption>
+  </figure>
+
+  <h3>Live system</h3>
+  <table class="data compact">
+    <thead><tr><th style="width:52%">Request to the live system (writes nothing) — 13 and 14 October 2026</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td>Fetch <code>results.html</code> and <code>admin.html</code> from the live site</td><td>Version 2.3 assets on 13 October (2.5 after the later releases); save card and question bank panel present</td></tr>
+      <tr><td>Call <code>claim_assessment</code> without signing in</td><td>Refused — permission denied (<code>42501</code>); the function exists and is not executable by the anonymous role</td></tr>
+      <tr><td>Read <code>questions</code> with the audit columns</td><td>Columns present; twenty rows; no edits recorded yet</td></tr>
+      <tr><td>Update a statement's wording without signing in</td><td>Zero rows affected (row-level security)</td></tr>
+      <tr><td>Read authentication settings</td><td>Email confirmation required; anonymous sign-ins enabled</td></tr>
+      <tr><td>Register on the live site with a Gmail address (creates one test account)</td><td>Code emailed from <code>noreply@crmpilot.com.au</code> within a minute (Figure 5)</td></tr>
+      <tr><td>Call <code>set_participant_archived</code> without signing in (14 October)</td><td>Refused — permission denied; the archive function exists and is not executable by the anonymous role</td></tr>
+      <tr><td>Call <code>admin_reset_test_data</code> (14 October)</td><td>Function not found — the reset path is gone from the live database</td></tr>
+      <tr><td>Fetch <code>admin.html</code> and its script after the merge (14 October)</td><td>Version 2.5; Archive and Restore actions present, no Delete action, no reset button</td></tr>
+      <tr><td>Vercel production deployment</td><td>Deployed from <code>94f1dee</code> (12 October 2026)</td></tr>
+    </tbody>
+  </table>
+  <p>We applied the Sprint 5 and question-bank migrations to the production database in the
+    Supabase SQL editor on 12 October 2026, and the archive migration on 14 October, confirming
+    each with the probes above straight afterwards.
+  </p>
+</section>
+
+<section class="newpage">
+  <h2><span class="n">14 · continued</span>Acceptance criteria</h2>
+  <p class="sub">Each acceptance criterion we derived from the client's Sprint 5 wording, with its evidence.
+    "Tester live run" marks the three criteria whose evidence is a claim or an administrator save
+    on the live site. The scripts are <code>SPRINT5_TEST_PLAN.md</code> (A and B) and
+    <code>QUESTION_BANK_TEST_PLAN.md</code> (B).</p>
+
+  <table class="data breakable">
+    <thead><tr><th style="width:5%">#</th><th style="width:31%">Criterion</th><th>How it is met</th><th style="width:20%">Evidence</th><th style="width:12%">Result</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td class="k">The user can start the evaluation anonymously</td><td>Unchanged from Sprint 4; nothing stored until submission</td><td>§05, live run (Sprint 4)</td><td><span class="pill done">Met</span></td></tr>
+      <tr><td>2</td><td class="k">At the end, the system offers to create an account</td><td>"Save these results to an account" card on the results page</td><td>§05, Fig. 1–2, browser</td><td><span class="pill done">Met</span></td></tr>
+      <tr><td>3</td><td class="k">An existing account holder can sign in and keep the result</td><td>Sign in tab in claim mode</td><td>§05, browser</td><td><span class="pill done">Met</span></td></tr>
+      <tr><td>4</td><td class="k">The completed result is saved to the account</td><td><code>claim_assessment()</code> sets the owner and email</td><td>§06, DB tests, live probe</td><td><span class="pill done">Met</span></td></tr>
+      <tr><td>5</td><td class="k">The result can be viewed later on the dashboard</td><td>Claimed result is the account's active result; dashboard reads the account's rows</td><td>§06, DB tests; live run A9–A10</td><td><span class="pill sched">Tester live run</span></td></tr>
+      <tr><td>6</td><td class="k">Scores stay on screen; no retake needed</td><td><code>identity.adopt()</code>; card updates in place</td><td>§05, Fig. 4, browser</td><td><span class="pill done">Met</span></td></tr>
+      <tr><td>7</td><td class="k">Only the submitting browser can claim; once; within 24 hours; attempt rules applied</td><td>Function rules; anonymous role has no grant</td><td>§06, DB tests, live probe</td><td><span class="pill done">Met</span></td></tr>
+      <tr><td>8</td><td class="k">Registering sends a 6-digit code to the email given</td><td>Sign-up confirmation with the code template; custom SMTP on a verified domain</td><td>§07, Fig. 5, live</td><td><span class="pill done">Met</span></td></tr>
+      <tr><td>9</td><td class="k">The account is verified only by entering the correct code</td><td>Wrong and expired codes refused; sign-in before verifying returns to the code panel</td><td>§07, browser; live run A7–A8, C3–C4</td><td><span class="pill sched">Tester live run</span></td></tr>
+      <tr><td>10</td><td class="k">Administrators see all twenty statements in the admin panel</td><td>Question bank panel</td><td>§08, Fig. 5, browser, live probe</td><td><span class="pill done">Met</span></td></tr>
+      <tr><td>11</td><td class="k">Administrators can edit a statement and the change reaches participants</td><td>Save under row-level security; pages read the database first</td><td>§08, Fig. 6, DB tests; live run B4–C2</td><td><span class="pill sched">Tester live run</span></td></tr>
+      <tr><td>12</td><td class="k">Only wording changes; edits are stamped; recorded answers unaffected</td><td>Trigger lock, length constraint, audit columns</td><td>§08, DB tests, live probe</td><td><span class="pill done">Met</span></td></tr>
+      <tr><td>13</td><td class="k">Added: a forgotten password can be reset with an emailed code</td><td>Forgot and reset steps; recovery code signs in, new password set</td><td>§09, Fig. 8–9, browser, live; tester run</td><td><span class="pill done">Met</span></td></tr>
+      <tr><td>14</td><td class="k">Added: administrators archive a participant, never delete one</td><td>Archive/Restore; delete policies removed; archive function guarded</td><td>§10, Fig. 10–11, DB tests, browser, live</td><td><span class="pill done">Met</span></td></tr>
+      <tr><td>15</td><td class="k">Added: the dashboard shows how long each participant spent</td><td>Time column, Time on task card, profile line, CSV columns</td><td>§11, Fig. 12–13, browser, live</td><td><span class="pill done">Met</span></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============================ 11 RISKS ============================ -->
+<section class="keep">
+  <h2><span class="n">15</span>Risks and limitations</h2>
+  <p class="sub">Known risks carried into handover, with the mitigation in place or planned.</p>
+
+  <table class="data compact">
+    <thead><tr><th style="width:26%">Risk</th><th style="width:26%">Consequence</th><th>Mitigation</th><th style="width:12%">Status</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Verification codes come from a company-domain sender</td><td><code>noreply@crmpilot.com.au</code> belongs to the development team's company, not the university.</td><td>Swap to a university sender at handover by changing the SMTP settings only; DKIM and SPF are aligned on the current domain. The results-email function still uses its earlier sender (Section 16).</td><td><span class="pill done">Accepted</span></td></tr>
+      <tr><td class="k">The offer to save lives in the results tab</td><td>Closing the tab before deciding loses the chance to claim.</td><td>Deliberate: no claimable id is left in persistent storage on shared devices. The server window is 24 hours.</td><td><span class="pill done">Accepted</span></td></tr>
+      <tr><td class="k">Reworded statements change meaning</td><td>Answers before and after an edit may not be comparable.</td><td>Edits are stamped with time and editor; equivalence to the original is the client's research judgement.</td><td><span class="pill done">Accepted</span></td></tr>
+      <tr><td class="k">Administrators are a fixed list</td><td>Adding an administrator needs a code and policy change.</td><td>Existing design; the handover guide will document the two places to change.</td><td><span class="pill done">Accepted</span></td></tr>
+      <tr><td class="k">Free-tier database pauses after seven idle days</td><td>Sign-in, submission and claims fail while paused.</td><td>Daily keep-alive request; answers stay on the device until submission.</td><td><span class="pill plan">Handover</span></td></tr>
+      <tr><td class="k">No automatic backups on the free plan</td><td>Data loss on project failure is unrecoverable.</td><td>Regular CSV export from the admin dashboard, or a paid plan.</td><td><span class="pill plan">Handover</span></td></tr>
+      <tr><td class="k">Credentials recorded in the handover notes</td><td>Anyone holding the notes has full access.</td><td>Rotate keys, tokens and admin passwords before handover; the notes are excluded from the repository.</td><td><span class="pill plan">Handover</span></td></tr>
+      <tr><td class="k">Stacked pull requests can merge to the wrong base</td><td>A release can appear merged without reaching the live site.</td><td>Merge the base first and wait for the retarget; check the live asset version after every release (Section 17).</td><td><span class="pill done">Mitigated</span></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============================ 12 DEPLOYMENT ============================ -->
+<section>
+  <h2><span class="n">16</span>Deployment and handover</h2>
+
+  <h3>Releases</h3>
+  <table class="data compact">
+    <thead><tr><th style="width:12%">Commit</th><th style="width:15%">Date</th><th>Change</th></tr></thead>
+    <tbody>
+      <tr><td><code>335669d</code></td><td class="nw">28 Sep 2026</td><td>Sprint 5: save an anonymous result to an account; verified registration; modal moved into <code>auth.js</code>; test plan (pull request 1)</td></tr>
+      <tr><td><code>fa0cb04</code></td><td class="nw">12 Oct 2026</td><td>Question bank: panel, module, migration, test plan (pull request 2)</td></tr>
+      <tr><td><code>f933854</code></td><td class="nw">12 Oct 2026</td><td>Pull request 1 merged to <code>main</code> — live at version 2.2</td></tr>
+      <tr><td><code>cff35b4</code></td><td class="nw">12 Oct 2026</td><td>Pull request 3 merged to <code>main</code> — question bank live at version 2.3</td></tr>
+      <tr><td><code>94f1dee</code></td><td class="nw">12 Oct 2026</td><td>Pull request 4 merged — home page team section</td></tr>
+      <tr><td>SQL editor</td><td class="nw">12 Oct 2026</td><td><code>sprint5-claim.sql</code> and <code>question-bank.sql</code> applied to the production database; confirmed by read-only probes</td></tr>
+      <tr><td><code>2ea485f</code></td><td class="nw">13 Oct 2026</td><td>Forgot password — pull request 5 (commit <code>2ea485f</code>), merged as <code>b85315f</code> and deployed to production the same day; live at version 2.4</td></tr>
+      <tr><td><code>f687899</code></td><td class="nw">14 Oct 2026</td><td>Archive instead of delete — pull request 6, merged as <code>1f3805c</code> and deployed; <code>archive-participants.sql</code> applied the same day; live at version 2.5</td></tr>
+      <tr><td><code>679e4a0</code></td><td class="nw">15 Oct 2026</td><td>Time on task — pull request 7, merged as <code>c6f7772</code> and deployed the same evening; live at version 2.6</td></tr>
+      <tr><td>Dashboard</td><td class="nw">13 Oct 2026</td><td>Authentication mailer switched to custom SMTP (Resend, <code>noreply@crmpilot.com.au</code>); confirm-signup template emits the 6-digit code; confirmed by a live registration (Figure 5)</td></tr>
+    </tbody>
+  </table>
+  <p>Front-end releases deploy to Vercel from <code>main</code>, and every merge produces a production
+    deployment. Asset URLs carry a version parameter (now 2.6) so browsers load the new files.
+    Each front end went live before its migration and tolerates its absence (Section 12).
+  </p>
+
+  <h3>Handover plan</h3>
+  <table class="data breakable">
+    <thead><tr><th style="width:28%">Item</th><th>Detail</th><th style="width:14%">Status</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Tester live run</td><td>A claim on the live site, sign-in to an existing account from the results page, one real administrator edit, a real password reset, and one archive and restore — <code>SPRINT5_TEST_PLAN.md</code> A–B, <code>QUESTION_BANK_TEST_PLAN.md</code> B, <code>FORGOT_PASSWORD_TEST_PLAN.md</code> A and <code>ARCHIVE_PARTICIPANTS_TEST_PLAN.md</code> A. Closes acceptance criteria 5, 9 and 11 and confirms 13 end to end.</td><td><span class="pill plan">Scheduled</span></td></tr>
+      <tr><td class="k">Results-email sender</td><td>Point the <code>send-results-email</code> function at the sender now used for verification codes (SMTP secrets) and redeploy it. Verification codes already use it.</td><td><span class="pill plan">Handover</span></td></tr>
+      <tr><td class="k">Credential rotation</td><td>Rotate the keys, tokens and admin passwords recorded in the handover notes before handover.</td><td><span class="pill plan">Handover</span></td></tr>
+      <tr><td class="k">Database pausing</td><td>Add a daily keep-alive request so the free project does not pause again.</td><td><span class="pill plan">Handover</span></td></tr>
+      <tr><td class="k">Backups</td><td>Export participant data (CSV) regularly or move to a paid plan.</td><td><span class="pill plan">Handover</span></td></tr>
+      <tr><td class="k">Ownership</td><td>Transfer the GitHub repository and Supabase project to university-owned accounts.</td><td><span class="pill plan">Handover</span></td></tr>
+      <tr><td class="k">Handover guide</td><td>Setup, migration order (now six files), administrators, email sender, recovery from pausing.</td><td><span class="pill plan">Handover</span></td></tr>
+      <tr><td class="k">Sign-up trigger fix</td><td>Confirm <code>fix-new-user-trigger.sql</code> has been applied to the live database.</td><td><span class="pill plan">Handover</span></td></tr>
+      <tr><td class="k">Research views by demographics</td><td>Cross-tabulating scores by demographic group in the admin dashboard, suggested in Sprint 4; not requested by the client for Sprint 5.</td><td><span class="pill plan">Later</span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <span class="lbl">Considerations for handover</span>
+    <p>The handover to the university is operational rather than functional: a sender address the university controls,
+    keys it holds, a monitor for the free tier, a backup routine, and a guide that lets someone
+    who was not on the team run all of it.</p>
+  </div>
+</section>
+
+<!-- ============================ 13 RETROSPECTIVE ============================ -->
+<section class="retro">
+  <h2><span class="n">17</span>Retrospective</h2>
+  <p class="sub">What the team keeps, what it changes, and the actions carried into handover.</p>
+
+  <h3>What worked</h3>
+  <ul>
+    <li>Reusing Sprint 4's rules instead of adding state. The claim applies the existing two-per-year trim and the existing session id; no new table, no new credential, and the dashboard needed no change.</li>
+    <li>Shipping the front end before the migration, with an honest message when the database is behind. Both releases were live and safe before the SQL was run.</li>
+    <li>Testing migrations in PGlite again. Fifty-three checks ran before either file touched production, including the refusals the browser never exercises.</li>
+    <li>Tester scripts as the acceptance evidence for what the team cannot observe itself. The four open criteria have a numbered step each, not a vague "test email".</li>
+    <li>A small, late request (the question bank) delivered the same day because the admin dashboard and the migration pattern were already there to extend.</li>
+  </ul>
+
+  <h3>What to change</h3>
+  <ul>
+    <li>Stacked pull requests: merge the base first and wait for the retarget before merging the next, then check the live asset version. The seven-second gap cost a third pull request.</li>
+    <li>Run the inbox test before the review, not after. Delivery is the one part of R2 the team cannot see from the code; it carried across two sprints and was closed the day after the release.</li>
+    <li>The Sprint 4 "next sprint" list assumed the handover items would be Sprint 5's scope; the client's requirements took precedence, as they should. Handover items need an owner and a date of their own rather than a place in a sprint that may be re-scoped.</li>
+  </ul>
+
+  <h3>Actions for handover</h3>
+  <table class="data compact">
+    <thead><tr><th style="width:38%">Action</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Tester completes the live run and records the results in the two test plans</td><td>Closes the three open acceptance criteria with a live claim and a real administrator edit.</td></tr>
+      <tr><td class="k">Point the results function at the sender now used for verification codes</td><td>Completes the email setup; codes already arrive.</td></tr>
+      <tr><td class="k">Rotate every credential and hand ownership to university accounts</td><td>Required before the platform leaves the team.</td></tr>
+      <tr><td class="k">Add a keep-alive request and a scheduled data export</td><td>Removes the two failure modes of the free tier.</td></tr>
+      <tr><td class="k">Write the handover guide</td><td>Setup, the six-file migration order, administrators, the email sender and recovery from pausing, so the platform does not depend on one person.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============================ 14 REFERENCES ============================ -->
+<section class="keep refs">
+  <h2><span class="n">18</span>References</h2>
+  <p>Chart.js contributors. (2024). <em>Chart.js</em> (Version 4.4.1) [Computer software]. https://www.chartjs.org</p>
+  <p>ElectricSQL. (n.d.). <em>PGlite: Postgres in WebAssembly</em> [Computer software]. https://pglite.dev</p>
+  <p>Firmin, S. (2020). <em>Unravelling pedagogy: The role of technology in shaping IT academics' perceptions and application of teaching and philosophy</em> [Doctoral dissertation, Monash University]. ProQuest Dissertations &amp; Theses Global.</p>
+  <p>Supabase. (n.d.). <em>Supabase documentation: Auth — email one-time passwords and row level security</em>. https://supabase.com/docs</p>
+  <p>World Wide Web Consortium. (2023). <em>Web Content Accessibility Guidelines (WCAG) 2.1</em>. https://www.w3.org/TR/WCAG21/</p>
+</section>
+
+<!-- ============================ 15 APPENDIX ============================ -->
+<section class="newpage">
+  <h2><span class="n">19</span>Appendix — files added and modified</h2>
+
+  <table class="data compact breakable">
+    <thead><tr><th style="width:40%">File</th><th style="width:12%">Change</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>sprint5-claim.sql</code></td><td>Added</td><td><code>claim_assessment()</code> and its grants</td></tr>
+      <tr><td><code>question-bank.sql</code></td><td>Added</td><td>Audit columns, length constraint, guard trigger, administrator update policy</td></tr>
+      <tr><td><code>js/question-bank.js</code></td><td>Added</td><td><code>PED.questionBank</code>: database wording overlay, admin fetch and update</td></tr>
+      <tr><td><code>SPRINT5_TEST_PLAN.md</code>, <code>QUESTION_BANK_TEST_PLAN.md</code></td><td>Added</td><td>Tester scripts (kept out of the published site)</td></tr>
+      <tr><td><code>js/auth.js</code></td><td>Modified</td><td>Modal rendered by the script; intents; <code>ped:signed-in</code> event; claim-mode copy</td></tr>
+      <tr><td><code>js/session.js</code></td><td>Modified</td><td><code>PED.identity.adopt()</code></td></tr>
+      <tr><td><code>js/assessment.js</code></td><td>Modified</td><td><code>claimSession()</code> and its error mapping</td></tr>
+      <tr><td><code>js/results.js</code>, <code>results.html</code>, <code>css/results.css</code>, <code>css/modal.css</code></td><td>Modified</td><td>Save-to-account card and saved states; modal styles for claim mode</td></tr>
+      <tr><td><code>js/questionnaire.js</code></td><td>Modified</td><td>Completion-screen copy for anonymous participants</td></tr>
+      <tr><td><code>js/admin.js</code>, <code>admin.html</code>, <code>css/admin.css</code></td><td>Modified</td><td>Question bank panel: rows, validation, save, restore</td></tr>
+      <tr><td><code>js/landing.js</code>, <code>questionnaire.html</code>, <code>index.html</code></td><td>Modified</td><td>Database wording overlay on the home page and questionnaire; team section; modal markup removed from the home page</td></tr>
+      <tr><td>All page HTML files</td><td>Modified</td><td>Versioned assets (2.2, then 2.3)</td></tr>
+      <tr><td><code>README.md</code></td><td>Modified</td><td>Sprint 5 and question bank sections; migration order</td></tr>
+      <tr><td><code>js/auth.js</code>, <code>css/modal.css</code>, <code>supabase/templates/reset-password.html</code>, <code>FORGOT_PASSWORD_TEST_PLAN.md</code></td><td>Added / modified (PR 5)</td><td>Forgot-password steps, styles, recovery email template, tester script</td></tr>
+      <tr><td><code>archive-participants.sql</code>, <code>js/admin.js</code>, <code>admin.html</code>, <code>css/admin.css</code>, <code>ARCHIVE_PARTICIPANTS_TEST_PLAN.md</code></td><td>Added / modified (PR 6)</td><td>Archive and restore, delete controls removed; <code>admin-delete-and-reset.sql</code> deleted</td></tr>
+      <tr><td><code>js/admin.js</code>, <code>admin.html</code>, <code>css/admin.css</code>, <code>TIME_ON_TASK_TEST_PLAN.md</code></td><td>Modified / added (PR 7)</td><td>Time column, Time on task card, profile line, CSV columns, tester script</td></tr>
+    </tbody>
+  </table>
+</section>
+
+</body>
+</html>
